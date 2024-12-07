@@ -7,6 +7,8 @@ import customtkinter
 class inputscreen:
     def __init__(self):
         self.screen = customtkinter.CTk() 
+
+        self.screen.eval('tk::PlaceWindow . center')
         customtkinter.set_appearance_mode("dark")
         self.screen.title("Braking Distance Simulator")
         width = self.screen.winfo_screenwidth()
