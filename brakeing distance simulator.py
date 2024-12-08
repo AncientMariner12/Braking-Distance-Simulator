@@ -25,10 +25,11 @@ class inputscreen:
         pass
     def display(self):
         #initalise all of the widgets 
-        Runtempwidgets = widgets(self.screen, "toggle tmpeture calc")
-        Ambienttempwidgets = widgets(self.screen, "Ambient Temp")
-        Diskdencitywidgets = widgets(self.screen, "Disk Dencity")
-        disksvolumewidgets = widgets(self.screen, "Disks Volume")
+        Runtempwidgets = widgets(self.screen, "Tempature calculation")
+        Ambienttempwidgets = widgets(self.screen, "Ambient Temp (C) ")
+        Diskdencitywidgets = widgets(self.screen, "Brake disk dencity (g/cm^3)")
+        Disksvolumewidgets = widgets(self.screen, "Disk Volume (cm^3)")
+        togglereacttimewidgets = widgets(self.screen, "Toggle React Time")
         Reacttimewidgets = widgets(self.screen, "React Time")
         Gravitywidgets = widgets(self.screen, "Gravity")
         Velocitywidgets = widgets(self.screen, "Velocity")
@@ -38,7 +39,21 @@ class inputscreen:
         Gradewidgets = widgets(self.screen, "Grade")
         Clampforcewidgets = widgets(self.screen, "Clamp Force")
         
-        widgetlist =[Runtempwidgets, Ambienttempwidgets, Diskdencitywidgets, disksvolumewidgets, Reacttimewidgets, Gravitywidgets, Velocitywidgets, fricitioncobrakeswidgets, Fricitioncotyreswidgets, Masswidgets, Gradewidgets, Clampforcewidgets]
+        #add all of the widgets to the screen
+        Runtempwidgets.addtoggle(10,10)
+        Ambienttempwidgets.addlabel(10, 10)
+        Ambienttempwidgets.addtextentry(10, 10)
+        Ambienttempwidgets.addslider(-100,100,10,10)
+        Diskdencitywidgets.addlabel(10, 10)
+        Diskdencitywidgets.addtextentry(10, 10)
+        Diskdencitywidgets.addslider(0,10,10,10)
+        Diskdencitywidgets.addlabel(10, 10)
+        Disksvolumewidgets.addtextentry(10, 10)
+        Disksvolumewidgets.addslider(100,500,10,10)
+        #togglereacttimewidgets.addtoggle()
+       
+
+        self.screen.mainloop()  # Start the Tkinter event loop
     def info(self):
         pass
     def reacttest(self):
@@ -54,9 +69,9 @@ class widgets:
 
     def addslider(self, widgetfrom, widgetto, x,y): #adds a slider to the screen
         self.slider = customtkinter.CTkSlider(self.screen, from_= widgetfrom, to= widgetto)
-        self.slider.pack(padx=x, pady=y)
-        self.placeholdertext=self.slider.get()
-        print(self.slider.get()) #test code
+        self.slider.grid(padx=x, pady=y)
+        self.placeholdertext=round(self.slider.get(), 2)
+        print(round(self.slider.get(),2)) #test code
 
     def addtoggle(self,x,y): 
         def toggleevent():
@@ -64,7 +79,7 @@ class widgets:
 
         #adds a toggle to the screen
         self.toggle = customtkinter.CTkSwitch(self.screen, text=self.label, command=toggleevent, onvalue=True, offvalue=False)
-        self.toggle.pack(padx=x, pady=y)
+        self.toggle.grid(padx=x, pady=y)
 
     def adddropdown(self,x,y): 
         def dropdownevent(choice):
@@ -73,7 +88,7 @@ class widgets:
         #adds a dropdown menu to the screen
         self.dropdown = customtkinter.CTkOptionMenu(self.screen, values=["test1", "test2", "test3"], command=dropdownevent)
         self.dropdown.set("test1")
-        self.dropdown.pack(padx=x, pady=y)
+        self.dropdown.grid(padx=x, pady=y)
 
     def addbutton(self,x,y): 
         def buttonevent():
@@ -81,16 +96,16 @@ class widgets:
 
         #adds a button to the screen
         self.button = customtkinter.CTkButton(self.screen, text=self.label, command=buttonevent)
-        self.button.pack(padx=x, pady=y)
+        self.button.grid(padx=x, pady=y)
 
     def addtextentry(self,x,y): #adds a text entry box to the screen
         self.entry =  customtkinter.CTkEntry(self.screen, textvariable= self.variable)
-        self.entry.pack(padx=x, pady=y)
+        self.entry.grid(padx=x, pady=y)
 
     #there are no default labels in the customtkinter module for the slider or text entry widgets so they have to be created manually here
     def addlabel(self,x,y): #adds a label to the screen
-        self.manuallabel = customtkinter.CTkLabel(self.screen, text="CTkLabel", fg_color="transparent")
-        self.manuallabel.pack(padx=x, pady=y)
+        self.manuallabel = customtkinter.CTkLabel(self.screen, text=self.label, fg_color="transparent")
+        self.manuallabel.grid(padx=x, pady=y)
 
 def main():
     dataentryscreen = inputscreen()
@@ -99,14 +114,15 @@ def main():
 main()
 
 #test code
-test =inputscreen()
-testscreen= test.getdisplay()
-testvar = "testing"
-widgets1 = widgets(testscreen, "test")
-widgets1.addslider(0,100,20,20)
-widgets1.addtextentry(20, 40)
-widgets1.addtoggle(20, 60)
-widgets1.adddropdown(20, 80)
-widgets1.addbutton(20, 100)
-testscreen.mainloop()
-print()
+
+#test =inputscreen()
+#testscreen= test.getdisplay()
+#testvar = "testing"
+#widgets1 = widgets(testscreen, "test")
+#widgets1.addslider(0,100,20,20)
+# widgets1.addtextentry(20, 40)
+#widgets1.addtoggle(20, 60)
+#widgets1.adddropdown(20, 80)
+#widgets1.addbutton(20, 100)
+#testscreen.mainloop()
+#print()
