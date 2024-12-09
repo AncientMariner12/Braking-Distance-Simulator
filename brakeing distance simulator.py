@@ -22,35 +22,58 @@ class inputscreen:
     def getdisplay(self):
         return self.screen
     def validate(self):
+        #validates the input data
 
-        Runtempwidgets = self.Runtempwidgets.returntogglestate()
-        Ambienttemp = self.Ambienttempwidgets.returnvalue()
-        Diskdencity = self.Diskdencitywidgets.returnvalue()
-        Brakemeltingpoint = self.Brakemeltingpointwidgets.returnvalue()
-        Diskvolume = self.Disksvolumewidgets.returnvalue()
-        Reacttime = self.Reacttimewidgets.returnvalue()
-        Gravity = self.Gravitywidgets.returnvalue()
-        Velocity = self.Velocitywidgets.returnvalue()
-        fricitioncobrakes = self.fricitioncobrakeswidgets.returnvalue()
-        frictioncoregen = self.frictioncoregenwidgets.returnvalue()
-        Fricitioncotyres = self.Fricitioncotyreswidgets.returnvalue()
-        Masswidgets = self.Masswidgets.returnvalue()
-        Gradewidgets = self.Gradewidgets.returnvalue()
-        Clampforcewidgets = self.Clampforcewidgets.returnvalue()
-        usemultiplier = self.usemultiplierwidgets.returntogglestate()
-        multiplier = self.multiplierwidgets.returnvalue()
-
-        numbers = (Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Masswidgets, Gradewidgets, Clampforcewidgets, multiplier)
-        coefficients = (fricitioncobrakes, frictioncoregen, Fricitioncotyres)
+        #assigns the widgets to a list
+        widgets = [self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets, self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets, self.multiplierwidgets]
+        coefficients = [self.fricitioncobrakeswidgets, self.frictioncoregenwidgets, self.Fricitioncotyreswidgets]
+        dropdownbrakemeltpoint = [["Cast iron (1150)", "AL-MMC (660)", "ceramic (1800)", "carbon composite (3000)"],[1150, 660, 1800, 3000]]
+        dropdowngravity = [["Sun (274.13)", "Mercury (3.59)", "Venus (8.87)", "Earth (9.81)", "Moon (1.62)", "Mars (3.77)", "Jupiter (25.95)", "Saturn (11.08)", "Uranus (10.67)", "Neptune (14.07)", "Pluto (0.42)"], [274.13, 3.59, 8.87, 9.81, 1.62, 3.77, 25.95, 11.08, 10.67, 14.07, 0.42]]
+        dropdownfricitioncotyres = [["Dry asphalt (0.9)", "Wet asphalt(0.6)","Dry gravel(0.6)","Dry dirt (0.5)", "Wet Gravel (0.4)","loose sand (0.3)", "Snow (0.2)", "Ice (0.1)"], [0.9, 0.6, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]]
         failedlist = []
-        for number in numbers:
+
+        #checks that the input data is a number
+        for widget in widgets:
             try:
-                float(number)
+                float(widget.returnvalue())
             except:
-                failedlist.append(numbers[number])
-        for coefficient in coefficients:
-            if coefficient < 0 or coefficient > 1:
-                failedlist.append(coefficient)
+                failedlist.append(widget.getlabel())
+
+        #assigns the dropdown menu values to the correct value
+        for i in range(len(dropdownbrakemeltpoint[0])):
+            if self.Brakemeltingpointwidgets.returnvalue() == dropdownbrakemeltpoint[0][i]:
+                self.Brakemeltingpointwidgets.variable.set(dropdownbrakemeltpoint[1][i])
+        
+        for i in range(len(dropdowngravity[0])):
+            if self.Gravitywidgets.returnvalue() == dropdowngravity[0][i]:
+                self.Gravitywidgets.variable.set(dropdowngravity[1][i])
+        
+        for i in range(len(dropdownfricitioncotyres[0])):
+            if self.Fricitioncotyreswidgets.returnvalue() == dropdownfricitioncotyres[0][i]:
+                self.Fricitioncotyreswidgets.variable.set(dropdownfricitioncotyres[1][i])
+
+        #checks that the input data is within the correct range
+        try:
+            for coefficient in coefficients:
+                if float(coefficient.returnvalue()) < 0 or float(coefficient.returnvalue()) > 1:
+                    failedlist.append(coefficient.getlabel())
+        except:
+            failedlist.append(coefficient.getlabel())
+
+        try:
+            if float(self.Gradewidgets.returnvalue()) < -100 or float(self.Gradewidgets.returnvalue()) > 100:
+                failedlist.append(self.Gradewidgets.getlabel())
+        except:
+            failedlist.append(self.Gradewidgets.getlabel())
+
+        #creates a textbox with the failed list
+        if failedlist:
+            textbox = customtkinter.CTkTextbox(self.screen, width=500, height=50)
+            textbox.grid(row=15, column=4)
+            textbox.delete("0.0", "end")  # delete all text
+            textbox.insert("0.0", "Please enter a valid number for the following fields: " + ", ".join(failedlist))  # insert at line 0 character 0
+            textbox.configure(state="disabled")  # configure textbox to be read-only
+        print(failedlist)
         
   
     def display(self):
@@ -161,7 +184,11 @@ class inputscreen:
     def reacttest(self):
         print("testing ur reactions :)")
         pass
+    def getlabel(self):
+        return self.label
+
     def simulate(self):
+        self.validate()
         runsimulation = simulation(self.Runtempwidgets, self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets, self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.fricitioncobrakeswidgets, self.frictioncoregenwidgets, self.Fricitioncotyreswidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets, self.usemultiplierwidgets, self.multiplierwidgets)
 
 
@@ -220,6 +247,10 @@ class widgets:
     
     def returntogglestate(self):
         return self.toggle.get()
+    
+    def getlabel(self):
+        return self.label
+
 class simulation:
     def __init__(self, Runtempwidgets, Ambienttempwidgets, Diskdencitywidgets, Brakemeltingpointwidgets, Disksvolumewidgets, Reacttimewidgets, Gravitywidgets, Velocitywidgets, fricitioncobrakeswidgets, frictioncoregenwidgets, Fricitioncotyreswidgets, Masswidgets, Gradewidgets, Clampforcewidgets, usemultiplierwidgets, multiplierwidgets):
 
