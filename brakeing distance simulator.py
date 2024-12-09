@@ -25,95 +25,95 @@ class inputscreen:
         pass
     def display(self):
         #initalise all of the widgets 
-        Runtempwidgets = widgets(self.screen, "Tempature calculation")
-        Ambienttempwidgets = widgets(self.screen, "Ambient Temp (C) ")
-        Diskdencitywidgets = widgets(self.screen, "Brake disk dencity (g/cm^3)")
-        Brakemeltingpointwidgets = widgets(self.screen, "Brake Melting Point (C) ")
-        Disksvolumewidgets = widgets(self.screen, "Disk Volume (cm^3)")
-        Reacttimewidgets = widgets(self.screen, "Reaction Time (s)")
-        Gravitywidgets = widgets(self.screen, "Gravity (m/s^2)")
-        Velocitywidgets = widgets(self.screen, "Velocity (m/s)")
-        fricitioncobrakeswidgets = widgets(self.screen, "Fricition Coefficent Brakes")
-        frictioncoregenwidgets = widgets(self.screen, "Fricition Coefficent Regen")
-        Fricitioncotyreswidgets = widgets(self.screen, "Fricition Coefficent Tyres")
-        Masswidgets = widgets(self.screen, "Mass (kg)")
-        Gradewidgets = widgets(self.screen, "Grade (%)")
-        Clampforcewidgets = widgets(self.screen, "Clamp Force (N)")
-        usemultiplierwidgets = widgets(self.screen, "Use Multiplyer")
-        multiplierwidgets = widgets(self.screen, "Multiplyer")
+        self.Runtempwidgets = widgets(self.screen, "Tempature calculation")
+        self.Ambienttempwidgets = widgets(self.screen, "Ambient Temp (C) ")
+        self.Diskdencitywidgets = widgets(self.screen, "Brake disk dencity (g/cm^3)")
+        self.Brakemeltingpointwidgets = widgets(self.screen, "Brake Melting Point (C) ")
+        self.Disksvolumewidgets = widgets(self.screen, "Disk Volume (cm^3)")
+        self.Reacttimewidgets = widgets(self.screen, "Reaction Time (s)")
+        self.Gravitywidgets = widgets(self.screen, "Gravity (m/s^2)")
+        self.Velocitywidgets = widgets(self.screen, "Velocity (m/s)")
+        self.fricitioncobrakeswidgets = widgets(self.screen, "Fricition Coefficent Brakes")
+        self.frictioncoregenwidgets = widgets(self.screen, "Fricition Coefficent Regen")
+        self.Fricitioncotyreswidgets = widgets(self.screen, "Fricition Coefficent Tyres")
+        self.Masswidgets = widgets(self.screen, "Mass (kg)")
+        self.Gradewidgets = widgets(self.screen, "Grade (%)")
+        self.Clampforcewidgets = widgets(self.screen, "Clamp Force (N)")
+        self.usemultiplierwidgets = widgets(self.screen, "Use Multiplyer")
+        self.multiplierwidgets = widgets(self.screen, "Multiplyer")
         
         #add the widgets to the screen
-        Runtempwidgets.addtoggle(0, 0) #adds the tempature calculation toggle
+        self.Runtempwidgets.addtoggle(0, 0) #adds the tempature calculation toggle
 
         #adds ambient tempature widgets
-        Ambienttempwidgets.addlabel(0, 1)
-        Ambienttempwidgets.addtextentry(1, 1)
-        Ambienttempwidgets.addslider(-100, 100, 2, 1)
+        self.Ambienttempwidgets.addlabel(0, 1)
+        self.Ambienttempwidgets.addtextentry(1, 1)
+        self.Ambienttempwidgets.addslider(-100, 100, 2, 1)
 
        #adds brake melting point widgets
-        Brakemeltingpointwidgets.addlabel(0, 2) 
-        Brakemeltingpointwidgets.addtextentry(1, 2)
-        Brakemeltingpointwidgets.adddropdown(["Cast iron (1150)", "AL-MMC (660)", "ceramic (1800)", "carbon composite (3000)"], 2, 2)
+        self.Brakemeltingpointwidgets.addlabel(0, 2) 
+        self.Brakemeltingpointwidgets.addtextentry(1, 2)
+        self.Brakemeltingpointwidgets.adddropdown(["Cast iron (1150)", "AL-MMC (660)", "ceramic (1800)", "carbon composite (3000)"], 2, 2, "Cast iron (1150)")
         
         #adds disk dencity widgets
-        Diskdencitywidgets.addlabel(0, 3)
-        Diskdencitywidgets.addtextentry(1, 3)
-        Diskdencitywidgets.addslider(0, 10, 2, 3)
+        self.Diskdencitywidgets.addlabel(0, 3)
+        self.Diskdencitywidgets.addtextentry(1, 3)
+        self.Diskdencitywidgets.addslider(0, 10, 2, 3)
 
         #adds disk volume widgets
-        Disksvolumewidgets.addlabel(0, 4)
-        Disksvolumewidgets.addtextentry(1, 4)
-        Disksvolumewidgets.addslider(100, 500, 2, 4)
+        self.Disksvolumewidgets.addlabel(0, 4)
+        self.Disksvolumewidgets.addtextentry(1, 4)
+        self.Disksvolumewidgets.addslider(100, 500, 2, 4)
 
         #adds reaction time widgets
-        Reacttimewidgets.addlabel(0, 5)
-        Reacttimewidgets.addtextentry(1, 5)
-        Reacttimewidgets.addbutton(2, 5, "reaction time test", self.reacttest)
+        self.Reacttimewidgets.addlabel(0, 5)
+        self.Reacttimewidgets.addtextentry(1, 5)
+        self.Reacttimewidgets.addbutton(2, 5, "reaction time test", self.reacttest)
         
         #adds gravity widgets
-        Gravitywidgets.addlabel(0, 6)
-        Gravitywidgets.addtextentry(1, 6)
-        Gravitywidgets.adddropdown(["Sun (274.13)", "Mercury (3.59)", "Venus (8.87)", "Earth (9.81)", "Moon (1.62)", "Mars (3.77)", "Jupiter (25.95)", "Saturn (11.08)", "Uranus (10.67)", "Neptune (14.07)", "Pluto (0.42)"], 2, 6)
+        self.Gravitywidgets.addlabel(0, 6)
+        self.Gravitywidgets.addtextentry(1, 6)
+        self.Gravitywidgets.adddropdown(["Sun (274.13)", "Mercury (3.59)", "Venus (8.87)", "Earth (9.81)", "Moon (1.62)", "Mars (3.77)", "Jupiter (25.95)", "Saturn (11.08)", "Uranus (10.67)", "Neptune (14.07)", "Pluto (0.42)"], 2, 6, "Earth (9.81)")
 
         #adds velocity widgets
-        Velocitywidgets.addlabel(0, 7)
-        Velocitywidgets.addtextentry(1, 7)
-        Velocitywidgets.addslider(1, 100, 2, 7)
+        self.Velocitywidgets.addlabel(0, 7)
+        self.Velocitywidgets.addtextentry(1, 7)
+        self.Velocitywidgets.addslider(1, 100, 2, 7)
 
         #adds fricition coefficent of the brakes widgets
-        fricitioncobrakeswidgets.addlabel(0, 8)
-        fricitioncobrakeswidgets.addtextentry(1, 8)
-        fricitioncobrakeswidgets.addslider(0.2, 0.8, 2, 8)
+        self.fricitioncobrakeswidgets.addlabel(0, 8)
+        self.fricitioncobrakeswidgets.addtextentry(1, 8)
+        self.fricitioncobrakeswidgets.addslider(0.2, 0.8, 2, 8)
 
         #adds fricition coefficent of the regen widgets
-        frictioncoregenwidgets.addlabel(0, 9)
-        frictioncoregenwidgets.addtextentry(1, 9)
-        frictioncoregenwidgets.addslider(0.1, 0.3, 2, 9)
+        self.frictioncoregenwidgets.addlabel(0, 9)
+        self.frictioncoregenwidgets.addtextentry(1, 9)
+        self.frictioncoregenwidgets.addslider(0.1, 0.3, 2, 9)
 
         #adds fricition coefficent of the tyres widgets
-        Fricitioncotyreswidgets.addlabel(0, 10)
-        Fricitioncotyreswidgets.addtextentry(1, 10)
-        fricitioncobrakeswidgets.adddropdown(["Dry asphalt (0.9)", "Wet asphalt(0.6)","Dry gravel(0.6)","Dry dirt (0.5)", "Wet Gravel (0.4)","loose sand (0.3)", "Snow (0.2)", "Ice (0.1)"], 2, 10)
+        self.Fricitioncotyreswidgets.addlabel(0, 10)
+        self.Fricitioncotyreswidgets.addtextentry(1, 10)
+        self.Fricitioncotyreswidgets.adddropdown(["Dry asphalt (0.9)", "Wet asphalt(0.6)","Dry gravel(0.6)","Dry dirt (0.5)", "Wet Gravel (0.4)","loose sand (0.3)", "Snow (0.2)", "Ice (0.1)"], 2, 10, "Dry asphalt (0.9)")
 
         #adds mass widgets
-        Masswidgets.addlabel(0, 11)
-        Masswidgets.addtextentry(1, 11)
-        Masswidgets.addslider(100, 2000, 2, 11)
+        self.Masswidgets.addlabel(0, 11)
+        self.Masswidgets.addtextentry(1, 11)
+        self.Masswidgets.addslider(100, 2000, 2, 11)
 
         #adds grade widgets
-        Gradewidgets.addlabel(0, 12)
-        Gradewidgets.addtextentry(1, 12)
-        Gradewidgets.addslider(-50, 50, 2, 12) 
+        self.Gradewidgets.addlabel(0, 12)
+        self.Gradewidgets.addtextentry(1, 12)
+        self.Gradewidgets.addslider(-50, 50, 2, 12) 
 
         #adds clamp force widgets
-        Clampforcewidgets.addlabel(0, 13)
-        Clampforcewidgets.addtextentry(1, 13)
+        self.Clampforcewidgets.addlabel(0, 13)
+        self.Clampforcewidgets.addtextentry(1, 13)
 
         #adds the use multiplyer toggle
-        usemultiplierwidgets.addtoggle(0, 14)
+        self.usemultiplierwidgets.addtoggle(0, 14)
 
         #adds multiplyer widgets
-        multiplierwidgets.addtextentry(1, 14)  
+        self.multiplierwidgets.addtextentry(1, 14)  
 
         #adds the simulate button
         simulatebutton = customtkinter.CTkButton(self.screen, text="Simulate", command=self.simulate) 
@@ -132,7 +132,8 @@ class inputscreen:
         print("testing ur reactions :)")
         pass
     def simulate(self):
-        pass
+        print(self.Runtempwidgets.returntogglestate())
+        print(self.Ambienttempwidgets.returnvalue())
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -141,10 +142,13 @@ class widgets:
         self.variable = customtkinter.StringVar()
 
     def addslider(self, widgetfrom, widgetto, column, row): #adds a slider to the screen
-        self.slider = customtkinter.CTkSlider(self.screen, from_= widgetfrom, to= widgetto)
+        def sliderevent(value):
+            self.variable.set(round(self.slider.get()))#action when slider is used #change WHAT ROUNDS TOO
+
+        self.slider = customtkinter.CTkSlider(self.screen, from_= widgetfrom, to= widgetto, command= sliderevent)
         self.slider.grid(row=row, column=column, padx=10, pady=10)
         self.placeholdertext=round(self.slider.get(), 2)
-        print(round(self.slider.get(),2)) #test code
+        #print(round(self.slider.get(),2)) #test code
 
     def addtoggle(self, column, row): 
         def toggleevent():
@@ -154,13 +158,13 @@ class widgets:
         self.toggle = customtkinter.CTkSwitch(self.screen, text=self.label, command=toggleevent, onvalue=True, offvalue=False)
         self.toggle.grid(row=row, column=column, padx=10, pady=10)
 
-    def adddropdown(self, options, column, row): 
+    def adddropdown(self, options, column, row, defultoption): 
         def dropdownevent(choice):
             self.dropdownchoice = choice #action when dropdown menu is used
 
         #adds a dropdown menu to the screen
-        self.dropdown = customtkinter.CTkOptionMenu(self.screen, values=options, command=dropdownevent)
-        self.dropdown.set("choose an option")
+        self.dropdown = customtkinter.CTkOptionMenu(self.screen, values=options, command=dropdownevent, variable=self.variable)
+        self.dropdown.set(defultoption)
         self.dropdown.grid(row=row, column=column, padx=10, pady=10)
 
     def addbutton(self, column, row, name, action): 
@@ -179,7 +183,17 @@ class widgets:
         self.manuallabel = customtkinter.CTkLabel(self.screen, text=self.label, fg_color="transparent")
         self.manuallabel.grid(row=row, column=column, padx=10, pady=10)
 
+    def returnvalue(self):
+
+        if self.variable.get() == "":
+            return self.slider.get()
+        return self.variable.get()
+    
+    def returntogglestate(self):
+        return self.toggle.get()
+
 def main():
+
     dataentryscreen = inputscreen()
     dataentryscreen.display() 
 
