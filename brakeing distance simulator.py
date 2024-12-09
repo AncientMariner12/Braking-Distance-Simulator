@@ -21,8 +21,38 @@ class inputscreen:
 
     def getdisplay(self):
         return self.screen
-    def valiadate(self):
-        pass
+    def validate(self):
+
+        Runtempwidgets = self.Runtempwidgets.returntogglestate()
+        Ambienttemp = self.Ambienttempwidgets.returnvalue()
+        Diskdencity = self.Diskdencitywidgets.returnvalue()
+        Brakemeltingpoint = self.Brakemeltingpointwidgets.returnvalue()
+        Diskvolume = self.Disksvolumewidgets.returnvalue()
+        Reacttime = self.Reacttimewidgets.returnvalue()
+        Gravity = self.Gravitywidgets.returnvalue()
+        Velocity = self.Velocitywidgets.returnvalue()
+        fricitioncobrakes = self.fricitioncobrakeswidgets.returnvalue()
+        frictioncoregen = self.frictioncoregenwidgets.returnvalue()
+        Fricitioncotyres = self.Fricitioncotyreswidgets.returnvalue()
+        Masswidgets = self.Masswidgets.returnvalue()
+        Gradewidgets = self.Gradewidgets.returnvalue()
+        Clampforcewidgets = self.Clampforcewidgets.returnvalue()
+        usemultiplier = self.usemultiplierwidgets.returntogglestate()
+        multiplier = self.multiplierwidgets.returnvalue()
+
+        numbers = (Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Masswidgets, Gradewidgets, Clampforcewidgets, multiplier)
+        coefficients = (fricitioncobrakes, frictioncoregen, Fricitioncotyres)
+        failedlist = []
+        for number in numbers:
+            try:
+                float(number)
+            except:
+                failedlist.append(numbers[number])
+        for coefficient in coefficients:
+            if coefficient < 0 or coefficient > 1:
+                failedlist.append(coefficient)
+        
+  
     def display(self):
         #initalise all of the widgets 
         self.Runtempwidgets = widgets(self.screen, "Tempature calculation")
@@ -132,8 +162,8 @@ class inputscreen:
         print("testing ur reactions :)")
         pass
     def simulate(self):
-        print(self.Runtempwidgets.returntogglestate())
-        print(self.Ambienttempwidgets.returnvalue())
+        runsimulation = simulation(self.Runtempwidgets, self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets, self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.fricitioncobrakeswidgets, self.frictioncoregenwidgets, self.Fricitioncotyreswidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets, self.usemultiplierwidgets, self.multiplierwidgets)
+
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -184,14 +214,33 @@ class widgets:
         self.manuallabel.grid(row=row, column=column, padx=10, pady=10)
 
     def returnvalue(self):
-
-        if self.variable.get() == "":
+        if hasattr(self, 'slider') and self.variable.get() == "":
             return self.slider.get()
         return self.variable.get()
     
     def returntogglestate(self):
         return self.toggle.get()
+class simulation:
+    def __init__(self, Runtempwidgets, Ambienttempwidgets, Diskdencitywidgets, Brakemeltingpointwidgets, Disksvolumewidgets, Reacttimewidgets, Gravitywidgets, Velocitywidgets, fricitioncobrakeswidgets, frictioncoregenwidgets, Fricitioncotyreswidgets, Masswidgets, Gradewidgets, Clampforcewidgets, usemultiplierwidgets, multiplierwidgets):
 
+        Runtempwidgets = Runtempwidgets.returntogglestate()
+        Ambienttemp = Ambienttempwidgets.returnvalue()
+        Diskdencity = Diskdencitywidgets.returnvalue()
+        Brakemeltingpoint = Brakemeltingpointwidgets.returnvalue()
+        Diskvolume = Disksvolumewidgets.returnvalue()
+        Reacttime = Reacttimewidgets.returnvalue()
+        Gravity = Gravitywidgets.returnvalue()
+        Velocity = Velocitywidgets.returnvalue()
+        fricitioncobrakes = fricitioncobrakeswidgets.returnvalue()
+        frictioncoregen = frictioncoregenwidgets.returnvalue()
+        Fricitioncotyres = Fricitioncotyreswidgets.returnvalue()
+        Masswidgets = Masswidgets.returnvalue()
+        Gradewidgets = Gradewidgets.returnvalue()
+        Clampforcewidgets = Clampforcewidgets.returnvalue()
+        usemultiplier = usemultiplierwidgets.returntogglestate()
+        multiplier = multiplierwidgets.returnvalue()
+        print(Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Masswidgets, Gradewidgets, Clampforcewidgets, usemultiplier, multiplier)
+    
 def main():
 
     dataentryscreen = inputscreen()
