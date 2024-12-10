@@ -32,12 +32,6 @@ class inputscreen:
         dropdownfricitioncotyres = [["Dry asphalt (0.9)", "Wet asphalt(0.6)","Dry gravel(0.6)","Dry dirt (0.5)", "Wet Gravel (0.4)","loose sand (0.3)", "Snow (0.2)", "Ice (0.1)"], [0.9, 0.6, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]]
         failedlist = []
 
-        #checks that the input data is a number
-        for widget in widgets:
-            try:
-                float(widget.returnvalue())
-            except:
-                failedlist.append(widget.getlabel())
 
         #assigns the dropdown menu values to the correct value
         for i in range(len(dropdownbrakemeltpoint[0])):
@@ -51,14 +45,23 @@ class inputscreen:
         for i in range(len(dropdownfricitioncotyres[0])):
             if self.Fricitioncotyreswidgets.returnvalue() == dropdownfricitioncotyres[0][i]:
                 self.Fricitioncotyreswidgets.variable.set(dropdownfricitioncotyres[1][i])
+    
+        
+        #checks that the input data is a number
+        for widget in widgets:
+            try:
+                float(widget.returnvalue())
+            except:
+                failedlist.append(widget.getlabel())
 
         #checks that the input data is within the correct range
-        try:
-            for coefficient in coefficients:
-                if float(coefficient.returnvalue()) < 0 or float(coefficient.returnvalue()) > 1:
+
+        for coefficient in coefficients:
+                try:
+                    if float(coefficient.returnvalue()) < 0 or float(coefficient.returnvalue()) > 1:
+                        failedlist.append(coefficient.getlabel())
+                except:
                     failedlist.append(coefficient.getlabel())
-        except:
-            failedlist.append(coefficient.getlabel())
 
         try:
             if float(self.Gradewidgets.returnvalue()) < -100 or float(self.Gradewidgets.returnvalue()) > 100:
