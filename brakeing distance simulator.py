@@ -10,7 +10,7 @@ class inputscreen:
         self.screen = customtkinter.CTk() 
 
         self.screen.eval('tk::PlaceWindow . center') #centers the window
-        customtkinter.set_appearance_mode("dark") #sets the window to dark mode
+        customtkinter.set_appearance_mode("defult") #sets the window to dark mode
         self.screen.title("Braking Distance Simulator") #sets the title of the window
 
         #sets the window to full screen
