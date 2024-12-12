@@ -10,7 +10,7 @@ class inputscreen:
         self.screen = customtkinter.CTk() 
 
         self.screen.eval('tk::PlaceWindow . center') #centers the window
-        customtkinter.set_appearance_mode("defult") #sets the window to dark mode
+        customtkinter.set_appearance_mode("dark") #sets the window to dark mode
         self.screen.title("Braking Distance Simulator") #sets the title of the window
 
         #sets the window to full screen
@@ -139,12 +139,12 @@ class inputscreen:
         #adds fricition coefficent of the brakes widgets
         self.fricitioncobrakeswidgets.addlabel(0, 8)
         self.fricitioncobrakeswidgets.addtextentry(1, 8)
-        self.fricitioncobrakeswidgets.addslider(0.2, 0.8, 2, 8)
+        self.fricitioncobrakeswidgets.addslider(20, 80, 2, 8)
 
         #adds fricition coefficent of the regen widgets
         self.frictioncoregenwidgets.addlabel(0, 9)
         self.frictioncoregenwidgets.addtextentry(1, 9)
-        self.frictioncoregenwidgets.addslider(0.1, 0.3, 2, 9)
+        self.frictioncoregenwidgets.addslider(10, 30, 2, 9)
 
         #adds fricition coefficent of the tyres widgets
         self.Fricitioncotyreswidgets.addlabel(0, 10)
@@ -203,12 +203,18 @@ class widgets:
 
     def addslider(self, widgetfrom, widgetto, column, row): #adds a slider to the screen
         def sliderevent(value):
-            self.variable.set(round(self.slider.get()))#action when slider is used #change WHAT ROUNDS TOO
+            self.variable.set(round(self.slider.get())) # action when slider is used
+            
+            # as the slider cannot take decimal values, for coefficients the output has to be converted from a percentage to a decimal 
+            if self.label in ["Fricition Coefficent Brakes", "Fricition Coefficent Regen", "Fricition Coefficent Tyres"]:
+                self.variable.set(str(float(self.variable.get()) / 100))  
 
-        self.slider = customtkinter.CTkSlider(self.screen, from_= widgetfrom, to= widgetto, command= sliderevent)
+        self.slider = customtkinter.CTkSlider(self.screen, from_=widgetfrom, to=widgetto, command=sliderevent)
         self.slider.grid(row=row, column=column, padx=10, pady=10)
-        self.placeholdertext=round(self.slider.get(), 2)
-        #print(round(self.slider.get(),2)) #test code
+        self.variable.set(round(self.slider.get(),2))
+        
+
+
 
     def addtoggle(self, column, row): 
         def toggleevent():
