@@ -25,8 +25,10 @@ class inputscreen:
         #validates the input data
 
         #assigns the widgets to a list
-        widgets = [self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets, self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets, self.multiplierwidgets]
+        widgets = [ self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets]
+        tempaturewidgets = [self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets]
         coefficients = [self.fricitioncobrakeswidgets, self.frictioncoregenwidgets, self.Fricitioncotyreswidgets]
+
         dropdownbrakemeltpoint = [["Cast iron (1150)", "AL-MMC (660)", "ceramic (1800)", "carbon composite (3000)"],[1150, 660, 1800, 3000]]
         dropdowngravity = [["Sun (274.13)", "Mercury (3.59)", "Venus (8.87)", "Earth (9.81)", "Moon (1.62)", "Mars (3.77)", "Jupiter (25.95)", "Saturn (11.08)", "Uranus (10.67)", "Neptune (14.07)", "Pluto (0.42)"], [274.13, 3.59, 8.87, 9.81, 1.62, 3.77, 25.95, 11.08, 10.67, 14.07, 0.42]]
         dropdownfricitioncotyres = [["Dry asphalt (0.9)", "Wet asphalt(0.6)","Dry gravel(0.6)","Dry dirt (0.5)", "Wet Gravel (0.4)","loose sand (0.3)", "Snow (0.2)", "Ice (0.1)"], [0.9, 0.6, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]]
@@ -69,6 +71,21 @@ class inputscreen:
         except:
             failedlist.append(self.Gradewidgets.getlabel())
 
+            #checks that the optional tempuature input data is a number if the toggle is on
+        if self.Runtempwidgets.returntogglestate() == True:
+            for tempaturewidget in tempaturewidgets:
+                try:
+                    float(tempaturewidget.returnvalue())
+                except:
+                    failedlist.append(tempaturewidget.getlabel())
+
+        #checks that the optional input of multiplyer is a number if the toggle is on
+        if self.usemultiplierwidgets.returntogglestate() == True:
+            try:
+                float(self.multiplierwidgets.returnvalue())
+            except:
+                failedlist.append(self.multiplierwidgets.getlabel())
+            
         #creates a textbox with the failed list
         if failedlist:
             textbox = customtkinter.CTkTextbox(self.screen, width=500, height=50)
@@ -76,6 +93,17 @@ class inputscreen:
             textbox.delete("0.0", "end")  # delete all text
             textbox.insert("0.0", "Please enter a valid number for the following fields: " + ", ".join(failedlist))  # insert at line 0 character 0
             textbox.configure(state="disabled")  # configure textbox to be read-only
+
+        #test code 
+        for widget in widgets:
+            print(widget.returnvalue())
+        for coefficient in coefficients:
+            print(coefficient.returnvalue())
+        print(self.Runtempwidgets.returntogglestate())
+        for tempaturewidget in tempaturewidgets:
+            print(tempaturewidget.returnvalue())
+        print(self.usemultiplierwidgets.returntogglestate())
+        print(self.multiplierwidgets.returnvalue())
         print(failedlist)
         
   
