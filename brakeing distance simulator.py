@@ -60,7 +60,7 @@ class inputscreen:
 
         for coefficient in coefficients:
                 try:
-                    if float(coefficient.returnvalue()) < 0 or float(coefficient.returnvalue()) > 1:
+                    if float(coefficient.returnvalue()) <= 0 or float(coefficient.returnvalue()) > 1:
                         failedlist.append(coefficient.getlabel())
                 except:
                     failedlist.append(coefficient.getlabel())
