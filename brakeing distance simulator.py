@@ -25,7 +25,7 @@ class inputscreen:
         #validates the input data
 
         #assigns the widgets to a list
-        widgets = [ self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets]
+        widgets = [ self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.Masswidgets, self.Clampforcewidgets]
         tempaturewidgets = [self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets]
         coefficients = [self.fricitioncobrakeswidgets, self.frictioncoregenwidgets, self.Fricitioncotyreswidgets]
 
@@ -291,7 +291,7 @@ class widgets:
 class simulation:
     def __init__(self, Runtempwidgets, Ambienttempwidgets, Diskdencitywidgets, Brakemeltingpointwidgets, Disksvolumewidgets, Reacttimewidgets, Gravitywidgets, Velocitywidgets, fricitioncobrakeswidgets, frictioncoregenwidgets, Fricitioncotyreswidgets, Masswidgets, Gradewidgets, Clampforcewidgets, usemultiplierwidgets, multiplierwidgets):
 
-        Runtempwidgets = Runtempwidgets.returntogglestate()
+        Runtemp = Runtempwidgets.returntogglestate()
         Ambienttemp = Ambienttempwidgets.returnvalue()
         Diskdencity = Diskdencitywidgets.returnvalue()
         Brakemeltingpoint = Brakemeltingpointwidgets.returnvalue()
@@ -304,10 +304,10 @@ class simulation:
         Fricitioncotyres = Fricitioncotyreswidgets.returnvalue()
         Masswidgets = Masswidgets.returnvalue()
         Gradewidgets = Gradewidgets.returnvalue()
-        Clampforcewidgets = Clampforcewidgets.returnvalue()
+        Clampforce = Clampforcewidgets.returnvalue()
         usemultiplier = usemultiplierwidgets.returntogglestate()
         multiplier = multiplierwidgets.returnvalue()
-        print(Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Masswidgets, Gradewidgets, Clampforcewidgets, usemultiplier, multiplier)
+        print(Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, Fricitioncotyres, frictioncoregen, Masswidgets, Gradewidgets, Clampforce, usemultiplier, multiplier)
     
 def main():
 
