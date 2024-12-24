@@ -10,7 +10,7 @@ class inputscreen:
         self.screen = customtkinter.CTk() 
 
         self.screen.eval('tk::PlaceWindow . center') #centers the window
-        customtkinter.set_appearance_mode("dark") #sets the window to dark mode
+        customtkinter.set_appearance_mode("defult") #sets the window to dark mode
         self.screen.title("Braking Distance Simulator") #sets the title of the window
 
         #sets the window to full screen
@@ -60,7 +60,7 @@ class inputscreen:
 
         for coefficient in coefficients:
                 try:
-                    if float(coefficient.returnvalue()) <= 0 or float(coefficient.returnvalue()) > 1:
+                    if float(coefficient.returnvalue()) < 0 or float(coefficient.returnvalue()) > 1:
                         failedlist.append(coefficient.getlabel())
                 except:
                     failedlist.append(coefficient.getlabel())
@@ -111,23 +111,24 @@ class inputscreen:
         #initalise all of the widgets 
         self.Runtempwidgets = widgets(self.screen, "Tempature calculation")
         self.Ambienttempwidgets = widgets(self.screen, "Ambient Temp (C) ")
-        self.Diskdencitywidgets = widgets(self.screen, "Brake disk dencity (g/cm^3)")
+        self.Diskdencitywidgets = widgets(self.screen, "Brake disk density (g/cm^3)")
         self.Brakemeltingpointwidgets = widgets(self.screen, "Brake Melting Point (C) ")
         self.Disksvolumewidgets = widgets(self.screen, "Disk Volume (cm^3)")
         self.Reacttimewidgets = widgets(self.screen, "Reaction Time (s)")
         self.Gravitywidgets = widgets(self.screen, "Gravity (m/s^2)")
         self.Velocitywidgets = widgets(self.screen, "Velocity (m/s)")
-        self.fricitioncobrakeswidgets = widgets(self.screen, "Fricition Coefficent Brakes")
-        self.frictioncoregenwidgets = widgets(self.screen, "Fricition Coefficent Regen")
-        self.Fricitioncotyreswidgets = widgets(self.screen, "Fricition Coefficent Tyres")
+        self.fricitioncobrakeswidgets = widgets(self.screen, "Friction Coefficient Brakes")
+        self.frictioncoregenwidgets = widgets(self.screen, "Friction Coefficient Regen")
+        self.Fricitioncotyreswidgets = widgets(self.screen, "Friction Coefficient Tyres")
         self.Masswidgets = widgets(self.screen, "Mass (kg)")
         self.Gradewidgets = widgets(self.screen, "Grade (%)")
         self.Clampforcewidgets = widgets(self.screen, "Clamp Force (N)")
         self.usemultiplierwidgets = widgets(self.screen, "Use Multiplyer")
-        self.multiplierwidgets = widgets(self.screen, "Multiplyer")
+        self.multiplierwidgets = widgets(self.screen, "Multiplier")
         
         #add the widgets to the screen
-        self.Runtempwidgets.addtoggle(0, 0) #adds the tempature calculation toggle
+        self.Runtempwidgets.addtoggle([self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets],0, 0) #adds the tempature calculation toggle
+        self.usemultiplierwidgets.addtoggle([self.multiplierwidgets], 0, 14)  #adds the multiplier toggle
 
         #adds ambient tempature widgets
         self.Ambienttempwidgets.addlabel(0, 1)
@@ -194,7 +195,7 @@ class inputscreen:
         self.Clampforcewidgets.addtextentry(1, 13)
 
         #adds the use multiplyer toggle
-        self.usemultiplierwidgets.addtoggle(0, 14)
+        self.usemultiplierwidgets.addtoggle(self.multiplierwidgets,0, 14)
 
         #adds multiplyer widgets
         self.multiplierwidgets.addtextentry(1, 14)  
@@ -244,9 +245,18 @@ class widgets:
 
 
 
-    def addtoggle(self, column, row): 
-        def toggleevent():
-            self.togglestate = self.toggle.get() #action when toggle is used
+    def addtoggle(self, affectingvalues, column, row): 
+        def toggleevent(): #action when toggle is used
+            self.togglestate = self.toggle.get()
+            try: #if there is only one widget that is affected by the toggle this causes an error so it is handles seperatly
+                for widget in affectingvalues:
+                    if not self.togglestate:
+                        widget.variable.set("Not required") # Set to not required when toggle is off
+                    else:
+                        widget.variable.set("")  # Reset to empty when toggle is on
+            except:
+                if not self.togglestate:
+                    affectingvalues.variable.set("Not required") # Set to not required when toggle is off
 
         #adds a toggle to the screen
         self.toggle = customtkinter.CTkSwitch(self.screen, text=self.label, command=toggleevent, onvalue=True, offvalue=False)
