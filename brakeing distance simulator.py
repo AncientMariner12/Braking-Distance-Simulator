@@ -221,7 +221,7 @@ class inputscreen:
 
     def simulate(self):
         self.validate()
-        runsimulation = simulation(self.Runtempwidgets, self.Ambienttempwidgets, self.Diskdencitywidgets, self.Brakemeltingpointwidgets, self.Disksvolumewidgets, self.Reacttimewidgets, self.Gravitywidgets, self.Velocitywidgets, self.fricitioncobrakeswidgets, self.frictioncoregenwidgets, self.Fricitioncotyreswidgets, self.Masswidgets, self.Gradewidgets, self.Clampforcewidgets, self.usemultiplierwidgets, self.multiplierwidgets)
+        runsimulation = simulation(self.Runtempwidgets.returnvalue, self.Ambienttempwidgets.returnvalue, self.Diskdencitywidgets.returnvalue, self.Brakemeltingpointwidgets.returnvalue, self.Disksvolumewidgets.returnvalue, self.Reacttimewidgets.returnvalue, self.Gravitywidgets.returnvalue, self.Velocitywidgets.returnvalue, self.fricitioncobrakeswidgets.returnvalue, self.frictioncoregenwidgets.returnvalue, self.Fricitioncotyreswidgets.returnvalue, self.Masswidgets.returnvalue, self.Gradewidgets.returnvalue, self.Clampforcewidgets.returnvalue, self.usemultiplierwidgets.returnvalue, self.multiplierwidgets.returnvalue)
 
 
 class widgets:
@@ -299,25 +299,50 @@ class widgets:
         return self.label
 
 class simulation:
-    def __init__(self, Runtempwidgets, Ambienttempwidgets, Diskdencitywidgets, Brakemeltingpointwidgets, Disksvolumewidgets, Reacttimewidgets, Gravitywidgets, Velocitywidgets, fricitioncobrakeswidgets, frictioncoregenwidgets, Fricitioncotyreswidgets, Masswidgets, Gradewidgets, Clampforcewidgets, usemultiplierwidgets, multiplierwidgets):
+    def __init__(self,  Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Mass, Grade, Clampforce, usemultiplier, multiplier):
+        self.Runtemp = Runtemp
+        self.Ambienttemp = Ambienttemp
+        self.Diskdencity = Diskdencity
+        self.Brakemeltingpoint = Brakemeltingpoint
+        self.Diskvolume = Diskvolume
+        self.Reacttime = Reacttime
+        self.Gravity = Gravity
+        self.Velocity = Velocity
+        self.fricitioncobrakes = fricitioncobrakes
+        self.frictioncoregen = frictioncoregen
+        self.Fricitioncotyres = Fricitioncotyres
+        self.Mass = Mass
+        self.Grade = Grade
+        self.Clampforce = Clampforce
+        self.usemultiplier = usemultiplier
+        self.multiplier = multiplier
 
-        Runtemp = Runtempwidgets.returntogglestate()
-        Ambienttemp = Ambienttempwidgets.returnvalue()
-        Diskdencity = Diskdencitywidgets.returnvalue()
-        Brakemeltingpoint = Brakemeltingpointwidgets.returnvalue()
-        Diskvolume = Disksvolumewidgets.returnvalue()
-        Reacttime = Reacttimewidgets.returnvalue()
-        Gravity = Gravitywidgets.returnvalue()
-        Velocity = Velocitywidgets.returnvalue()
-        fricitioncobrakes = fricitioncobrakeswidgets.returnvalue()
-        frictioncoregen = frictioncoregenwidgets.returnvalue()
-        Fricitioncotyres = Fricitioncotyreswidgets.returnvalue()
-        Masswidgets = Masswidgets.returnvalue()
-        Gradewidgets = Gradewidgets.returnvalue()
-        Clampforce = Clampforcewidgets.returnvalue()
-        usemultiplier = usemultiplierwidgets.returntogglestate()
-        multiplier = multiplierwidgets.returnvalue()
-        print(Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, Fricitioncotyres, frictioncoregen, Masswidgets, Gradewidgets, Clampforce, usemultiplier, multiplier)
+    def conversions(self):
+        if self.Runtemp == True:
+            self.Brakedencity = self.Diskdencity * 1000
+            self.Diskvolume = self.Diskvolume * 0.000001 
+
+
+    def lock(self): #checks if the wheels of the vehicle has locked
+        if self.Fricitioncotyres * self.Gravity * self.Mass > 2 * self.fricitioncobrakes * self.Clampforce:
+            self.lock = False 
+        else:
+            self.lock = True
+
+    def stopingdistance(self):
+        totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
+
+        if self.lock == False:
+            denominator = 2 * totalcoeficent * self.Gravity
+            numerator = self.Velocity ** 2
+            self.stoppingdistance = numerator / denominator
+        else:
+            numerator = 0.5 * self.Mass * (self.Velocity ** 2)
+            denominator = totalcoeficent * self.Mass * self.Gravity
+            self.stoppingdistance = numerator / denominator
+        
+       
+        
     
 def main():
 
@@ -327,16 +352,3 @@ def main():
 
 main()
 
-#test code
-
-#test =inputscreen()
-#testscreen= test.getdisplay()
-#testvar = "testing"
-#widgets1 = widgets(testscreen, "test")
-#widgets1.addslider(0,100,20,20)
-# widgets1.addtextentry(20, 40)
-#widgets1.addtoggle(20, 60)
-#widgets1.adddropdown(20, 80)
-#widgets1.addbutton(20, 100)
-#testscreen.mainloop()
-#print()
