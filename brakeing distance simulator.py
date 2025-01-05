@@ -10,7 +10,7 @@ class inputscreen:
         self.screen = customtkinter.CTk() 
 
         self.screen.eval('tk::PlaceWindow . center') #centers the window
-        customtkinter.set_appearance_mode("defult") #sets the window to dark mode
+        customtkinter.set_appearance_mode("defult") #sets the window to th uers system mode
         self.screen.title("Braking Distance Simulator") #sets the title of the window
 
         #sets the window to full screen
@@ -317,7 +317,7 @@ class simulation:
         self.usemultiplier = usemultiplier
         self.multiplier = multiplier
 
-    def conversions(self):
+    def conversions(self): #convets the input data to stadard units
         if self.Runtemp == True:
             self.Brakedencity = self.Diskdencity * 1000
             self.Diskvolume = self.Diskvolume * 0.000001 
@@ -329,19 +329,53 @@ class simulation:
         else:
             self.lock = True
 
-    def stopingdistance(self):
+    def stopingdistance(self): #calculates the stopping distance of the vehicle
         totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
 
-        if self.lock == False:
+        if self.lock == False: #if the wheels have not locked
             denominator = 2 * totalcoeficent * self.Gravity
             numerator = self.Velocity ** 2
             self.stoppingdistance = numerator / denominator
-        else:
+        else: #if the wheels have locked
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
             denominator = totalcoeficent * self.Mass * self.Gravity
             self.stoppingdistance = numerator / denominator
+    
+    def tempcalclations(self): #calculates the tempature of the brake disk
+        self.heatgen = self.Mass * self.Velocity *0.5 #calculates the heat generated in the brakeing process
+
+        #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
+        #then calculates the tempature change of the disk
+
+        if self.Brakemeltingpoint > 500 self.Brakemeltingpoint < 660:
+            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 887
+
+        elif self.Brakemeltingpoint > 1100 and self.Brakemeltingpoint < 1200:
+            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 920
+
+        elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
+            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 	554
         
-       
+        elif self.Brakemeltingpoint < 1800:
+            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 850
+        
+        #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
+        else:
+            popup = customtkinter.CTk() 
+            popup.eval('tk::PlaceWindow . center') #centers the window
+            self.screen.title("Specifc heat capacity") #sets the title of the window
+
+            width = 30
+            height = 10
+            geometry = str(width) + "x" + str(height)
+            popup.geometry(geometry)
+        
+        self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
+    
+    def stopingtime(self): #calculates the stopping time of the vehicle
+        denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
+        self.stoppingtime = self.Velocity / denominator
+
         
     
 def main():
