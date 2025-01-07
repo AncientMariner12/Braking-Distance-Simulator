@@ -221,8 +221,12 @@ class inputscreen:
 
     def simulate(self):
         self.validate()
-        runsimulation = simulation(self.Runtempwidgets.returnvalue, self.Ambienttempwidgets.returnvalue, self.Diskdencitywidgets.returnvalue, self.Brakemeltingpointwidgets.returnvalue, self.Disksvolumewidgets.returnvalue, self.Reacttimewidgets.returnvalue, self.Gravitywidgets.returnvalue, self.Velocitywidgets.returnvalue, self.fricitioncobrakeswidgets.returnvalue, self.frictioncoregenwidgets.returnvalue, self.Fricitioncotyreswidgets.returnvalue, self.Masswidgets.returnvalue, self.Gradewidgets.returnvalue, self.Clampforcewidgets.returnvalue, self.usemultiplierwidgets.returnvalue, self.multiplierwidgets.returnvalue)
-
+        runsimulation = simulation(self.Runtempwidgets.returnvalue(), self.Ambienttempwidgets.returnvalue(), self.Diskdencitywidgets.returnvalue(), self.Brakemeltingpointwidgets.returnvalue(), self.Disksvolumewidgets.returnvalue(), self.Reacttimewidgets.returnvalue(), self.Gravitywidgets.returnvalue(), self.Velocitywidgets.returnvalue(), self.fricitioncobrakeswidgets.returnvalue(), self.frictioncoregenwidgets.returnvalue(), self.Fricitioncotyreswidgets.returnvalue(), self.Masswidgets.returnvalue(), self.Gradewidgets.returnvalue(), self.Clampforcewidgets.returnvalue(), self.usemultiplierwidgets.returnvalue(), self.multiplierwidgets.returnvalue())
+        runsimulation.conversions()
+        runsimulation.lock()
+        runsimulation.stopingdistance()
+        runsimulation.tempcalclations()
+        runsimulation.stopingtime()
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -235,7 +239,7 @@ class widgets:
             self.variable.set(round(self.slider.get())) # action when slider is used
             
             # as the slider cannot take decimal values, for coefficients the output has to be converted from a percentage to a decimal 
-            if self.label in ["Fricition Coefficent Brakes", "Fricition Coefficent Regen", "Fricition Coefficent Tyres"]:
+            if self.label in ["Friction Coefficient Brakes", "Friction Coefficient Regen", "Friction Coefficient Tyres"]:
                 self.variable.set(str(float(self.variable.get()) / 100))  
 
         self.slider = customtkinter.CTkSlider(self.screen, from_=widgetfrom, to=widgetto, command=sliderevent)
@@ -301,21 +305,23 @@ class widgets:
 class simulation:
     def __init__(self,  Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Mass, Grade, Clampforce, usemultiplier, multiplier):
         self.Runtemp = Runtemp
-        self.Ambienttemp = Ambienttemp
-        self.Diskdencity = Diskdencity
-        self.Brakemeltingpoint = Brakemeltingpoint
-        self.Diskvolume = Diskvolume
-        self.Reacttime = Reacttime
-        self.Gravity = Gravity
-        self.Velocity = Velocity
-        self.fricitioncobrakes = fricitioncobrakes
-        self.frictioncoregen = frictioncoregen
-        self.Fricitioncotyres = Fricitioncotyres
-        self.Mass = Mass
-        self.Grade = Grade
-        self.Clampforce = Clampforce
-        self.usemultiplier = usemultiplier
-        self.multiplier = multiplier
+        if self.Runtemp == True:
+            self.Ambienttemp = float(Ambienttemp)
+            self.Diskdencity = float(Diskdencity)
+            self.Brakemeltingpoint = float(Brakemeltingpoint)
+            self.Diskvolume = float(Diskvolume)
+        self.Reacttime = float(Reacttime)
+        self.Gravity = float(Gravity)
+        self.Velocity = float(Velocity)
+        self.fricitioncobrakes = float(fricitioncobrakes)
+        self.frictioncoregen = float(frictioncoregen)
+        self.Fricitioncotyres = float(Fricitioncotyres)
+        self.Mass = float(Mass)
+        self.Grade = float(Grade)
+        self.Clampforce = float(Clampforce)
+        if usemultiplier == "True":
+            self.usemultiplier = usemultiplier
+            self.multiplier = float(multiplier)
 
     def conversions(self): #convets the input data to stadard units
         if self.Runtemp == True:
@@ -324,7 +330,7 @@ class simulation:
 
 
     def lock(self): #checks if the wheels of the vehicle has locked
-        if self.Fricitioncotyres * self.Gravity * self.Mass > 2 * self.fricitioncobrakes * self.Clampforce:
+        if (self.Fricitioncotyres * self.Gravity * self.Mass) > (2 * self.fricitioncobrakes * self.Clampforce):
             self.lock = False 
         else:
             self.lock = True
@@ -347,7 +353,7 @@ class simulation:
         #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
         #then calculates the tempature change of the disk
 
-        if self.Brakemeltingpoint > 500 self.Brakemeltingpoint < 660:
+        if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint < 660:
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 887
 
         elif self.Brakemeltingpoint > 1100 and self.Brakemeltingpoint < 1200:
