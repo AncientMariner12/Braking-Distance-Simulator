@@ -93,18 +93,11 @@ class inputscreen:
             textbox.delete("0.0", "end")  # delete all text
             textbox.insert("0.0", "Please enter a valid number for the following fields: " + ", ".join(failedlist))  # insert at line 0 character 0
             textbox.configure(state="disabled")  # configure textbox to be read-only
+            return False
+        else:
+            return True
 
-        #test code 
-        for widget in widgets:
-            print(widget.returnvalue())
-        for coefficient in coefficients:
-            print(coefficient.returnvalue())
-        print(self.Runtempwidgets.returntogglestate())
-        for tempaturewidget in tempaturewidgets:
-            print(tempaturewidget.returnvalue())
-        print(self.usemultiplierwidgets.returntogglestate())
-        print(self.multiplierwidgets.returnvalue())
-        print(failedlist)
+
         
   
     def display(self):
@@ -220,13 +213,32 @@ class inputscreen:
         return self.label
 
     def simulate(self):
-        self.validate()
-        runsimulation = simulation(self.Runtempwidgets.returnvalue(), self.Ambienttempwidgets.returnvalue(), self.Diskdencitywidgets.returnvalue(), self.Brakemeltingpointwidgets.returnvalue(), self.Disksvolumewidgets.returnvalue(), self.Reacttimewidgets.returnvalue(), self.Gravitywidgets.returnvalue(), self.Velocitywidgets.returnvalue(), self.fricitioncobrakeswidgets.returnvalue(), self.frictioncoregenwidgets.returnvalue(), self.Fricitioncotyreswidgets.returnvalue(), self.Masswidgets.returnvalue(), self.Gradewidgets.returnvalue(), self.Clampforcewidgets.returnvalue(), self.usemultiplierwidgets.returnvalue(), self.multiplierwidgets.returnvalue())
-        runsimulation.conversions()
-        runsimulation.lock()
-        runsimulation.stopingdistance()
-        runsimulation.tempcalclations()
-        runsimulation.stopingtime()
+        passed = self.validate()
+        if passed:
+            runsimulation = simulation(
+                self.Runtempwidgets.returntogglestate(), 
+                self.Ambienttempwidgets.returnvalue(), 
+                self.Diskdencitywidgets.returnvalue(), 
+                self.Brakemeltingpointwidgets.returnvalue(), 
+                self.Disksvolumewidgets.returnvalue(), 
+                self.Reacttimewidgets.returnvalue(), 
+                self.Gravitywidgets.returnvalue(), 
+                self.Velocitywidgets.returnvalue(), 
+                self.fricitioncobrakeswidgets.returnvalue(), 
+                self.frictioncoregenwidgets.returnvalue(), 
+                self.Fricitioncotyreswidgets.returnvalue(), 
+                self.Masswidgets.returnvalue(), 
+                self.Gradewidgets.returnvalue(), 
+                self.Clampforcewidgets.returnvalue(), 
+                self.usemultiplierwidgets.returntogglestate(), 
+                self.multiplierwidgets.returnvalue()
+            )
+            runsimulation.conversions()
+            runsimulation.lock()
+            runsimulation.stopingdistance()
+            if self.Runtempwidgets.returntogglestate():
+                runsimulation.tempcalclations()
+            runsimulation.stopingtime()
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -353,6 +365,7 @@ class simulation:
         #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
         #then calculates the tempature change of the disk
 
+
         if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint < 660:
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 887
 
@@ -362,26 +375,27 @@ class simulation:
         elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 	554
         
-        elif self.Brakemeltingpoint < 1800:
-            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 850
         
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
             popup = customtkinter.CTk() 
             popup.eval('tk::PlaceWindow . center') #centers the window
-            self.screen.title("Specifc heat capacity") #sets the title of the window
+            popup.title("Specifc heat capacity") #sets the title of the window
 
-            width = 30
-            height = 10
+            width = 600
+            height = 300
             geometry = str(width) + "x" + str(height)
             popup.geometry(geometry)
+            popup.mainloop()  # Start the event loop
         
         self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
     
     def stopingtime(self): #calculates the stopping time of the vehicle
         denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
         self.stoppingtime = self.Velocity / denominator
-
+        popupwidgets = widgets(self.popup, "The material entered is not reconised, please enter the specific heat capacity of the disk") 
+        popupwidgets.addlabel(0, 0)
+        popupwidgets.addtextentry(0, 1)
         
     
 def main():
