@@ -378,10 +378,12 @@ class simulation:
         
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
-            def event():#button event loop
+            def event(): # button event loop
                 try:
+                    print(popupwidgets.returnvalue)
                     self.specificheatcapacity = float(popupwidgets.returnvalue())
-                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * self.specificheatcapacity) #calculates the tempature change of the disk
+
+                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * self.specificheatcapacity) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
                 except:
                     pass
@@ -399,9 +401,10 @@ class simulation:
             
             #adds the widgets to the screen
             popupwidgets = widgets(popup, "The material entered is not reconised, please enter the specific heat capacity of the disk")
+            popupbutton = widgets(popup, "submit")
             popupwidgets.addlabel(0, 0)
             popupwidgets.addtextentry(0, 1)
-            popupwidgets.addbutton(0, 2, "Submit", event)
+            popupbutton.addbutton(0, 2, "Submit", event)
             popup.mainloop()  # Start the event loop
         
         self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
@@ -409,9 +412,7 @@ class simulation:
     def stopingtime(self): #calculates the stopping time of the vehicle
         denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
         self.stoppingtime = self.Velocity / denominator
-        popupwidgets = widgets(self.popup, "The material entered is not reconised, please enter the specific heat capacity of the disk") 
-        popupwidgets.addlabel(0, 0)
-        popupwidgets.addtextentry(0, 1)
+
         
     
 def main():
