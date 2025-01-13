@@ -218,12 +218,11 @@ class inputscreen:
     def reacttest(self):
         print("testing ur reactions :)")
         pass
-    def getlabel(self):
-        return self.label
+
 
     def simulate(self):
         failedlist = self.validate()
-        if failedlist != []:
+        if failedlist is None:
             runsimulation = simulation(self.Runtemp, self.Ambienttempwidgets.returnvalue(), self.Diskdencitywidgets.returnvalue(), self.Brakemeltingpointwidgets.returnvalue(), self.Disksvolumewidgets.returnvalue(), self.Reacttimewidgets.returnvalue(), self.Gravitywidgets.returnvalue(), self.Velocitywidgets.returnvalue(), self.fricitioncobrakeswidgets.returnvalue(), self.frictioncoregenwidgets.returnvalue(), self.Fricitioncotyreswidgets.returnvalue(), self.Masswidgets.returnvalue(), self.Gradewidgets.returnvalue(), self.Clampforcewidgets.returnvalue(), self.usemultiplierwidgets.returntogglestate(), self.multiplierwidgets.returnvalue())
             runsimulation.conversions()
             runsimulation.lock()
@@ -271,6 +270,7 @@ class widgets:
         self.togglestate = self.toggle.get()  # Initialize the toggle state
 
     def adddropdown(self, options, column, row, defultoption): 
+        self.dropdownchoice = 0
         def dropdownevent(choice):
             self.dropdownchoice = choice #action when dropdown menu is used
 
@@ -338,14 +338,14 @@ class simulation:
 
     def lock(self): #checks if the wheels of the vehicle has locked
         if (self.Fricitioncotyres * self.Gravity * self.Mass) > (2 * self.fricitioncobrakes * self.Clampforce):
-            self.lock = False 
+            self.islock = False 
         else:
-            self.lock = True
+            self.islock = True
 
     def stopingdistance(self): #calculates the stopping distance of the vehicle
         totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
 
-        if self.lock == False: #if the wheels have not locked
+        if self.islock == False: #if the wheels have not locked
             denominator = 2 * totalcoeficent * self.Gravity
             numerator = self.Velocity ** 2
             self.stoppingdistance = numerator / denominator
@@ -368,20 +368,37 @@ class simulation:
 
         elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 	554
-        
-        elif self.Brakemeltingpoint < 1800:
-            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 850
+
         
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
-            popup = customtkinter.CTk() 
-            popup.eval('tk::PlaceWindow . center') #centers the window
-            self.screen.title("Specifc heat capacity") #sets the title of the window
+            
+            def event(): # button event loop
 
-            width = 30
-            height = 10
+                    print(popupwidgets.returnvalue())
+                    Specificheatcapacity = float(popupwidgets.returnvalue())
+
+                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * Specificheatcapacity) # calculates the tempature change of the disk
+                    popup.destroy() # closes the popup window
+
+
+            popup = customtkinter.CTk() #creates window
+            popup.eval('tk::PlaceWindow . center') #centers the window
+            popup.title("Specifc heat capacity") #sets the title of the window
+            
+            # sets the size of the window
+            width = 500
+            height = 150
             geometry = str(width) + "x" + str(height)
             popup.geometry(geometry)
+            
+            #adds the widgets to the screen
+            popupwidgets = widgets(popup, "The material entered is not reconised, please enter the specific heat capacity of the disk")
+            popupbutton = widgets(popup, "submit")
+            popupwidgets.addlabel(0, 0)
+            popupwidgets.addtextentry(0, 1)
+            popupbutton.addbutton(0, 2, "Submit", event)
+            popup.mainloop()  # Start the event loop)
         
         self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
     
