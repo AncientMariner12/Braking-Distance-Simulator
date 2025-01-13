@@ -34,6 +34,7 @@ class inputscreen:
         dropdownfricitioncotyres = [["Dry asphalt (0.9)", "Wet asphalt(0.6)","Dry gravel(0.6)","Dry dirt (0.5)", "Wet Gravel (0.4)","loose sand (0.3)", "Snow (0.2)", "Ice (0.1)"], [0.9, 0.6, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]]
         failedlist = []
 
+        self.Runtemp = self.Runtempwidgets.returntogglestate()
 
         #assigns the dropdown menu values to the correct value
         for i in range(len(dropdownbrakemeltpoint[0])):
@@ -93,11 +94,19 @@ class inputscreen:
             textbox.delete("0.0", "end")  # delete all text
             textbox.insert("0.0", "Please enter a valid number for the following fields: " + ", ".join(failedlist))  # insert at line 0 character 0
             textbox.configure(state="disabled")  # configure textbox to be read-only
-            return False
-        else:
-            return True
+            return(failedlist)
 
-
+        #test code 
+        for widget in widgets:
+            print(widget.returnvalue())
+        for coefficient in coefficients:
+            print(coefficient.returnvalue())
+        print(self.Runtempwidgets.returntogglestate())
+        for tempaturewidget in tempaturewidgets:
+            print(tempaturewidget.returnvalue())
+        print(self.usemultiplierwidgets.returntogglestate())
+        print(self.multiplierwidgets.returnvalue())
+        print(failedlist)
         
   
     def display(self):
@@ -213,31 +222,13 @@ class inputscreen:
         return self.label
 
     def simulate(self):
-        passed = self.validate()
-        if passed:
-            runsimulation = simulation(
-                self.Runtempwidgets.returntogglestate(), 
-                self.Ambienttempwidgets.returnvalue(), 
-                self.Diskdencitywidgets.returnvalue(), 
-                self.Brakemeltingpointwidgets.returnvalue(), 
-                self.Disksvolumewidgets.returnvalue(), 
-                self.Reacttimewidgets.returnvalue(), 
-                self.Gravitywidgets.returnvalue(), 
-                self.Velocitywidgets.returnvalue(), 
-                self.fricitioncobrakeswidgets.returnvalue(), 
-                self.frictioncoregenwidgets.returnvalue(), 
-                self.Fricitioncotyreswidgets.returnvalue(), 
-                self.Masswidgets.returnvalue(), 
-                self.Gradewidgets.returnvalue(), 
-                self.Clampforcewidgets.returnvalue(), 
-                self.usemultiplierwidgets.returntogglestate(), 
-                self.multiplierwidgets.returnvalue()
-            )
+        failedlist = self.validate()
+        if failedlist != []:
+            runsimulation = simulation(self.Runtemp, self.Ambienttempwidgets.returnvalue(), self.Diskdencitywidgets.returnvalue(), self.Brakemeltingpointwidgets.returnvalue(), self.Disksvolumewidgets.returnvalue(), self.Reacttimewidgets.returnvalue(), self.Gravitywidgets.returnvalue(), self.Velocitywidgets.returnvalue(), self.fricitioncobrakeswidgets.returnvalue(), self.frictioncoregenwidgets.returnvalue(), self.Fricitioncotyreswidgets.returnvalue(), self.Masswidgets.returnvalue(), self.Gradewidgets.returnvalue(), self.Clampforcewidgets.returnvalue(), self.usemultiplierwidgets.returntogglestate(), self.multiplierwidgets.returnvalue())
             runsimulation.conversions()
             runsimulation.lock()
             runsimulation.stopingdistance()
-            if self.Runtempwidgets.returntogglestate():
-                runsimulation.tempcalclations()
+            runsimulation.tempcalclations()
             runsimulation.stopingtime()
 
 class widgets:
@@ -277,6 +268,7 @@ class widgets:
         #adds a toggle to the screen
         self.toggle = customtkinter.CTkSwitch(self.screen, text=self.label, command=toggleevent, onvalue=True, offvalue=False)
         self.toggle.grid(row=row, column=column, padx=10, pady=10)
+        self.togglestate = self.toggle.get()  # Initialize the toggle state
 
     def adddropdown(self, options, column, row, defultoption): 
         def dropdownevent(choice):
@@ -309,7 +301,7 @@ class widgets:
         return self.variable.get()
     
     def returntogglestate(self):
-        return self.toggle.get()
+        return self.togglestate
     
     def getlabel(self):
         return self.label
@@ -317,11 +309,14 @@ class widgets:
 class simulation:
     def __init__(self,  Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Mass, Grade, Clampforce, usemultiplier, multiplier):
         self.Runtemp = Runtemp
+        print(self.Runtemp)
         if self.Runtemp == True:
+            print("true")
+            #print(Diskdencity)
             self.Ambienttemp = float(Ambienttemp)
             self.Diskdencity = float(Diskdencity)
-            self.Brakemeltingpoint = float(Brakemeltingpoint)
             self.Diskvolume = float(Diskvolume)
+            self.Brakemeltingpoint = float(Brakemeltingpoint)
         self.Reacttime = float(Reacttime)
         self.Gravity = float(Gravity)
         self.Velocity = float(Velocity)
@@ -365,7 +360,6 @@ class simulation:
         #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
         #then calculates the tempature change of the disk
 
-
         if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint < 660:
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 887
 
@@ -375,39 +369,21 @@ class simulation:
         elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 	554
         
+        elif self.Brakemeltingpoint < 1800:
+            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 850
         
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
-            def event(): # button event loop
-                try:
-                    print(popupwidgets.returnvalue)
-                    self.specificheatcapacity = float(popupwidgets.returnvalue())
-
-                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * self.specificheatcapacity) # calculates the tempature change of the disk
-                    popup.destroy() # closes the popup window
-                except:
-                    pass
-
-
             popup = customtkinter.CTk() 
             popup.eval('tk::PlaceWindow . center') #centers the window
-            popup.title("Specifc heat capacity") #sets the title of the window
+            self.screen.title("Specifc heat capacity") #sets the title of the window
 
-            # sets the size of the window
-            width = 500
-            height = 150
+            width = 30
+            height = 10
             geometry = str(width) + "x" + str(height)
             popup.geometry(geometry)
-            
-            #adds the widgets to the screen
-            popupwidgets = widgets(popup, "The material entered is not reconised, please enter the specific heat capacity of the disk")
-            popupbutton = widgets(popup, "submit")
-            popupwidgets.addlabel(0, 0)
-            popupwidgets.addtextentry(0, 1)
-            popupbutton.addbutton(0, 2, "Submit", event)
-            popup.mainloop()  # Start the event loop
         
-        self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
+        self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
     
     def stopingtime(self): #calculates the stopping time of the vehicle
         denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
