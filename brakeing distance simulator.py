@@ -227,14 +227,15 @@ class inputscreen:
             runsimulation.conversions()
             runsimulation.lock()
             runsimulation.stopingdistance()
-            runsimulation.tempcalclations()
+            if self.Runtempwidgets.returntogglestate() == True:
+                runsimulation.tempcalclations()
             runsimulation.stopingtime()
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
         self.screen = screen
         self.label = label
-        self.variable = customtkinter.StringVar()
+        self.variable = customtkinter.StringVar()  # Initialize variable
 
     def addslider(self, widgetfrom, widgetto, column, row): #adds a slider to the screen
         def sliderevent(value):
@@ -299,7 +300,7 @@ class widgets:
         if hasattr(self, 'slider') and self.variable.get() == "":
             return self.slider.get()
         return self.variable.get()
-    
+
     def returntogglestate(self):
         return self.togglestate
     
@@ -373,32 +374,36 @@ class simulation:
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
             
-            def event(): # button event loop
-
+            def popupevent(popupwidgets): # button event loop
+                try:
                     print(popupwidgets.returnvalue())
                     Specificheatcapacity = float(popupwidgets.returnvalue())
-
                     self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * Specificheatcapacity) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
 
+                except ValueError: # destroy the error label if it already exists and creates a new one
+                    if hasattr(popupevent, 'error_label'):
+                        popupevent.error_label.destroy()
+                    popupevent.error_label = customtkinter.CTkLabel(popup, text="Please enter a valid number", fg_color="transparent")
+                    popupevent.error_label.grid(row=3, column=0, padx=10, pady=10)
 
-            popup = customtkinter.CTk() #creates window
-            popup.eval('tk::PlaceWindow . center') #centers the window
-            popup.title("Specifc heat capacity") #sets the title of the window
-            
+            popup = customtkinter.CTk() # creates window
+            popup.eval('tk::PlaceWindow . center') # centers the window
+            popup.title("Specific heat capacity") # sets the title of the window
+
             # sets the size of the window
             width = 500
             height = 150
             geometry = str(width) + "x" + str(height)
             popup.geometry(geometry)
-            
-            #adds the widgets to the screen
-            popupwidgets = widgets(popup, "The material entered is not reconised, please enter the specific heat capacity of the disk")
+
+            # adds the widgets to the screen
+            popupwidgets = widgets(popup, "The material entered is not recognized, please enter the specific heat capacity of the disk")
             popupbutton = widgets(popup, "submit")
             popupwidgets.addlabel(0, 0)
             popupwidgets.addtextentry(0, 1)
-            popupbutton.addbutton(0, 2, "Submit", event)
-            popup.mainloop()  # Start the event loop)
+            popupbutton.addbutton(0, 2, "Submit", lambda: popupevent(popupwidgets))
+            popup.mainloop()  # Start the event loop
         
         self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
     
