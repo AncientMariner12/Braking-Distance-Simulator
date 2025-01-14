@@ -357,7 +357,7 @@ class simulation:
         self.stoppingdistance = self.brakeingdistance + (self.Reacttime * self.Velocity)
     
     def tempcalclations(self): #calculates the tempature of the brake disk
-        self.heatgen = self.Mass * self.Velocity *0.5 #calculates the heat generated in the brakeing process
+        self.heatgen = self.Mass * self.Velocity * 0.5 #calculates the heat generated in the brakeing process
 
         #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
         #then calculates the tempature change of the disk
@@ -369,20 +369,19 @@ class simulation:
             self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 920
 
         elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
-            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 	554
+            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 554
 
-        
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
-            
             def popupevent(): # button event loop
                 try:
-                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(self.specificheatcapacity)) # calculates the tempature change of the disk
+                    entered_value = self.specificheatcapacity.get()
+                    print(f"Entered value: {entered_value}")
+                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(entered_value)) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
-
-                except:
+                except Exception as e:
+                    print(f"Error: {e}")
                     # destroy the error label if it already exists and creates a new one
-                    print("error")
                     if hasattr(popupevent, 'error_label'):
                         popupevent.error_label.destroy()
                     popupevent.error_label = customtkinter.CTkLabel(popup, text="Please enter a valid number", fg_color="transparent")
@@ -401,16 +400,18 @@ class simulation:
             # adds the widgets to the screen
             self.specificheatcapacity = customtkinter.StringVar() 
             
-            label = customtkinter.CTkLabel(popup, text="Material not reconsied please enter its spefic heat capacity", fg_color="transparent")
-            label.grid(0,0)
-            popuptextentry =  customtkinter.CTkEntry(popup, textvariable=self.specificheatcapacity)
-            popuptextentry.grid(0,1)
+            label = customtkinter.CTkLabel(popup, text="Material not recognized, please enter its specific heat capacity", fg_color="transparent")
+            label.grid(row=0, column=0, padx=10, pady=10)
+            popuptextentry = customtkinter.CTkEntry(popup, textvariable=self.specificheatcapacity)
+            popuptextentry.grid(row=0, column=1, padx=10, pady=10)
+            
             #adds a button to the screen
-            button = customtkinter.CTkButton(popup, text="submit", popupevent()
-            button.grid(0,2)
+            button = customtkinter.CTkButton(popup, text="Submit", command=popupevent)
+            button.grid(row=0, column=2, padx=10, pady=10)
 
-        
-        self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
+            popup.mainloop()
+
+        self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
     
     def stopingtime(self): #calculates the stopping time of the vehicle
         denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
