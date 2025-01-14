@@ -343,17 +343,18 @@ class simulation:
         else:
             self.islock = True
 
-    def stopingdistance(self): #calculates the stopping distance of the vehicle
+    def stopingdistance(self): #calculates the brakeing and stopping distance of the vehicle
         totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
 
         if self.islock == False: #if the wheels have not locked
             denominator = 2 * totalcoeficent * self.Gravity
             numerator = self.Velocity ** 2
-            self.stoppingdistance = numerator / denominator
+            self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
             denominator = totalcoeficent * self.Mass * self.Gravity
-            self.stoppingdistance = numerator / denominator
+            self.brakeingdistance = numerator / denominator
+        self.stoppingdistance = self.brakeingdistance + (self.Reacttime * self.Velocity)
     
     def tempcalclations(self): #calculates the tempature of the brake disk
         self.heatgen = self.Mass * self.Velocity *0.5 #calculates the heat generated in the brakeing process
@@ -374,14 +375,14 @@ class simulation:
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
             
-            def popupevent(popupwidgets): # button event loop
+            def popupevent(): # button event loop
                 try:
-                    print(popupwidgets.returnvalue())
-                    Specificheatcapacity = float(popupwidgets.returnvalue())
-                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * Specificheatcapacity) # calculates the tempature change of the disk
+                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(self.specificheatcapacity)) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
 
-                except ValueError: # destroy the error label if it already exists and creates a new one
+                except:
+                    # destroy the error label if it already exists and creates a new one
+                    print("error")
                     if hasattr(popupevent, 'error_label'):
                         popupevent.error_label.destroy()
                     popupevent.error_label = customtkinter.CTkLabel(popup, text="Please enter a valid number", fg_color="transparent")
@@ -398,12 +399,16 @@ class simulation:
             popup.geometry(geometry)
 
             # adds the widgets to the screen
-            popupwidgets = widgets(popup, "The material entered is not recognized, please enter the specific heat capacity of the disk")
-            popupbutton = widgets(popup, "submit")
-            popupwidgets.addlabel(0, 0)
-            popupwidgets.addtextentry(0, 1)
-            popupbutton.addbutton(0, 2, "Submit", lambda: popupevent(popupwidgets))
-            popup.mainloop()  # Start the event loop
+            self.specificheatcapacity = customtkinter.StringVar() 
+            
+            label = customtkinter.CTkLabel(popup, text="Material not reconsied please enter its spefic heat capacity", fg_color="transparent")
+            label.grid(0,0)
+            popuptextentry =  customtkinter.CTkEntry(popup, textvariable=self.specificheatcapacity)
+            popuptextentry.grid(0,1)
+            #adds a button to the screen
+            button = customtkinter.CTkButton(popup, text="submit", popupevent()
+            button.grid(0,2)
+
         
         self. maxtemp= self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
     
