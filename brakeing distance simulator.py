@@ -375,7 +375,7 @@ class simulation:
         else:
             def popupevent(): # button event loop
                 try:
-                    entered_value = self.specificheatcapacity.get()
+                    entered_value = popuptextentry.get()
                     print(f"Entered value: {entered_value}")
                     self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(entered_value)) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
