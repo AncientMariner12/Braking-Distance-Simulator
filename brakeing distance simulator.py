@@ -375,12 +375,10 @@ class simulation:
         else:
             def popupevent(): # button event loop
                 try:
-                    entered_value = popuptextentry.get()
-                    print(f"Entered value: {entered_value}")
+                    entered_value = popuptextentry.get() # gets the value entered by the user
                     self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(entered_value)) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
                 except Exception as e:
-                    print(f"Error: {e}")
                     # destroy the error label if it already exists and creates a new one
                     if hasattr(popupevent, 'error_label'):
                         popupevent.error_label.destroy()
@@ -392,8 +390,8 @@ class simulation:
             popup.title("Specific heat capacity") # sets the title of the window
 
             # sets the size of the window
-            width = 500
-            height = 150
+            width = 700
+            height = 100
             geometry = str(width) + "x" + str(height)
             popup.geometry(geometry)
 
