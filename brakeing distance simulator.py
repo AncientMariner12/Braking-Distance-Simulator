@@ -230,6 +230,7 @@ class inputscreen:
             if self.Runtempwidgets.returntogglestate() == True:
                 runsimulation.tempcalclations()
             runsimulation.stopingtime()
+            print(runsimulation.returnvalues())
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -327,14 +328,15 @@ class simulation:
         self.Mass = float(Mass)
         self.Grade = float(Grade)
         self.Clampforce = float(Clampforce)
+        self.usemultiplier = usemultiplier
         if usemultiplier == "True":
-            self.usemultiplier = usemultiplier
             self.multiplier = float(multiplier)
 
     def conversions(self): #convets the input data to stadard units
         if self.Runtemp == True:
-            self.Brakedencity = self.Diskdencity * 1000
-            self.Diskvolume = self.Diskvolume * 0.000001 
+            self.Brakedencity = self.Diskdencity * 1000 #coverts the brake disk dencity to kg/m^3
+            self.Diskvolume = self.Diskvolume * 0.000001 # coverts the disk volume to m^3
+        self.Grade = self.Grade / 100 #coverts the grade to a decimal
 
 
     def lock(self): #checks if the wheels of the vehicle has locked
@@ -347,14 +349,21 @@ class simulation:
         totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
 
         if self.islock == False: #if the wheels have not locked
-            denominator = 2 * totalcoeficent * self.Gravity
+            denominator = 2 * totalcoeficent * (self.Gravity + self.Grade)
             numerator = self.Velocity ** 2
             self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
-            denominator = totalcoeficent * self.Mass * self.Gravity
+            denominator = totalcoeficent * self.Mass * (self.Gravity + self.Grade)
             self.brakeingdistance = numerator / denominator
+
+        #applys the multiplyer if it is enabled 
+        if self.usemultiplier == True:
+            self.brakeingdistance = self.brakeingdistance * self.multiplier
+
         self.stoppingdistance = self.brakeingdistance + (self.Reacttime * self.Velocity)
+
+
     
     def tempcalclations(self): #calculates the tempature of the brake disk
         self.heatgen = self.Mass * self.Velocity * 0.5 #calculates the heat generated in the brakeing process
@@ -375,10 +384,12 @@ class simulation:
         else:
             def popupevent(): # button event loop
                 try:
-                    entered_value = popuptextentry.get() # gets the value entered by the user
+                    entered_value = popuptextentry.get()
+                    print(f"Entered value: {entered_value}")
                     self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(entered_value)) # calculates the tempature change of the disk
                     popup.destroy() # closes the popup window
                 except Exception as e:
+                    print(f"Error: {e}")
                     # destroy the error label if it already exists and creates a new one
                     if hasattr(popupevent, 'error_label'):
                         popupevent.error_label.destroy()
@@ -413,7 +424,17 @@ class simulation:
     
     def stopingtime(self): #calculates the stopping time of the vehicle
         denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
-        self.stoppingtime = self.Velocity / denominator
+        self.brakeingtime = self.Velocity / denominator
+        #applies the multiplier if it is enabled
+        if self.usemultiplier == True:
+            self.brakeingtime = self.brakeingtime * self.multiplier
+        self.stoppingtime = self.brakeingtime + self.Reacttime
+    
+    def returnvalues(self):
+        if self.Runtemp == True:
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.tempchange, self.maxtemp, self.heatgen, self.islock)
+        else:
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime)
 
         
     
