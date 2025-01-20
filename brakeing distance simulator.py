@@ -221,6 +221,7 @@ class inputscreen:
 
 
     def simulate(self):
+        print("Starting simulation")
         failedlist = self.validate()
         if failedlist is None:
             runsimulation = simulation(self.Runtemp, self.Ambienttempwidgets.returnvalue(), self.Diskdencitywidgets.returnvalue(), self.Brakemeltingpointwidgets.returnvalue(), self.Disksvolumewidgets.returnvalue(), self.Reacttimewidgets.returnvalue(), self.Gravitywidgets.returnvalue(), self.Velocitywidgets.returnvalue(), self.fricitioncobrakeswidgets.returnvalue(), self.frictioncoregenwidgets.returnvalue(), self.Fricitioncotyreswidgets.returnvalue(), self.Masswidgets.returnvalue(), self.Gradewidgets.returnvalue(), self.Clampforcewidgets.returnvalue(), self.usemultiplierwidgets.returntogglestate(), self.multiplierwidgets.returnvalue())
@@ -229,8 +230,11 @@ class inputscreen:
             runsimulation.stopingdistance()
             if self.Runtempwidgets.returntogglestate() == True:
                 runsimulation.tempcalclations()
+            print("Before stopingtime")
             runsimulation.stopingtime()
+            print("After stopingtime")
             print(runsimulation.returnvalues())
+        print("Completed simulation")
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -329,18 +333,19 @@ class simulation:
         self.Grade = float(Grade)
         self.Clampforce = float(Clampforce)
         self.usemultiplier = usemultiplier
+        self.tempchange = 0
         if usemultiplier == True:
             self.multiplier = float(multiplier)
 
     def conversions(self): #convets the input data to stadard units
         if self.Runtemp == True:
-            self.Brakedencity = self.Diskdencity * 1000 #coverts the brake disk dencity to kg/m^3
+            self.Diskdencity = self.Diskdencity * 1000 #coverts the brake disk dencity to kg/m^3
             self.Diskvolume = self.Diskvolume * 0.000001 # coverts the disk volume to m^3
         self.Grade = self.Grade / 100 #coverts the grade to a decimal
 
 
     def lock(self): #checks if the wheels of the vehicle has locked
-        if (self.Fricitioncotyres * self.Gravity * self.Mass) > (2 * self.fricitioncobrakes * self.Clampforce):
+        if (self.Fricitioncotyres * self.Gravity * self.Mass) > (2 * (self.fricitioncobrakes + self.frictioncoregen) *self.Clampforce):
             self.islock = False 
         else:
             self.islock = True
@@ -354,7 +359,7 @@ class simulation:
             self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
-            denominator = totalcoeficent * self.Mass * (self.Gravity + self.Grade)
+            denominator = (totalcoeficent + self.Grade) * self.Mass * self.Gravity
             self.brakeingdistance = numerator / denominator
 
         #applys the multiplyer if it is enabled 
@@ -371,14 +376,14 @@ class simulation:
         #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
         #then calculates the tempature change of the disk
 
-        if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint <= 660:
-            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 887
+        if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint < 660:
+            self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * 887)
 
         elif self.Brakemeltingpoint > 1100 and self.Brakemeltingpoint < 1200:
-            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 920
+            self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * 920)
 
         elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
-            self.tempchange = self.Diskdencity * self.Diskvolume * 4 * 554
+            self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * 554)
 
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
@@ -386,8 +391,8 @@ class simulation:
                 try:
                     entered_value = popuptextentry.get()
                     print(f"Entered value: {entered_value}")
-                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * float(entered_value)) # calculates the tempature change of the disk
-                    popup.destroy() # closes the popup window
+                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 *float(entered_value)) # calculates the tempature change of the disk
+
                 except Exception as e:
                     print(f"Error: {e}")
                     # destroy the error label if it already exists and creates a new one
@@ -415,15 +420,15 @@ class simulation:
             popuptextentry.grid(row=0, column=1, padx=10, pady=10)
             
             #adds a button to the screen
-            button = customtkinter.CTkButton(popup, text="Submit", command=popupevent)
+            button = customtkinter.CTkButton(popup, text="Submit", command=popupevent())
             button.grid(row=0, column=2, padx=10, pady=10)
 
-            popup.mainloop()
+ 
 
         self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
-    
+
     def stopingtime(self): #calculates the stopping time of the vehicle
-        denominator = (self.fricitioncobrakes + self.Grade)* self.Gravity
+        denominator = (self.fricitioncobrakes + self.frictioncoregen + self.Grade)* self.Gravity
         self.brakeingtime = self.Velocity / denominator
         #applies the multiplier if it is enabled
         if self.usemultiplier == True:
@@ -440,8 +445,12 @@ class simulation:
     
 def main():
 
+
     dataentryscreen = inputscreen()
     dataentryscreen.display() 
+
+
+main()
 
 
 main()
