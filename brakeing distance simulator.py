@@ -354,7 +354,7 @@ class simulation:
         totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
 
         if self.islock == False: #if the wheels have not locked
-            denominator = 2 * totalcoeficent * (self.Gravity + self.Grade)
+            denominator = 2 * self.Gravity * (totalcoeficent  + self.Grade)
             numerator = self.Velocity ** 2
             self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
@@ -435,7 +435,7 @@ class simulation:
             self.brakeingtime = self.brakeingtime * self.multiplier
         self.stoppingtime = self.brakeingtime + self.Reacttime
     
-    def returnvalues(self):
+    def returnvalues(self): #returns the results of the simulation
         if self.Runtemp == True:
             return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.tempchange, self.maxtemp, self.heatgen, self.islock)
         else:
