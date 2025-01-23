@@ -442,7 +442,12 @@ class simulation:
             return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime)
 
         
-    
+class resultsscreen:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((800, 600))
+
+
 def main():
 
 
