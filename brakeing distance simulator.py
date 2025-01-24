@@ -234,7 +234,9 @@ class inputscreen:
             runsimulation.stopingtime()
             print("After stopingtime")
             print(runsimulation.returnvalues())
-        print("Completed simulation")
+            print("Completed simulation")
+            outputscreen = resultsscreen()
+            outputscreen.animation()
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -445,7 +447,21 @@ class simulation:
 class resultsscreen:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((2500, 1000), pygame.RESIZABLE)
+        self.screen.fill("black")
+    def animation(self):
+        running = True
+        car = pygame.image.load("car.png")
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            self.screen.fill((255, 255, 255))
+            self.screen.blit(car, (100, 100))
+            pygame.display.update()
+            clock = pygame.time.Clock()
+        clock.tick(60)
+        pygame.quit()
 
 
 def main():
@@ -453,6 +469,7 @@ def main():
 
     dataentryscreen = inputscreen()
     dataentryscreen.display() 
+
 
 
 main()
