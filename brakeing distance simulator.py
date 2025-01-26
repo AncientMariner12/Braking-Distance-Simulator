@@ -246,7 +246,7 @@ class widgets:
 
     def addslider(self, widgetfrom, widgetto, column, row): #adds a slider to the screen
         def sliderevent(value):
-            self.variable.set(round(self.slider.get())) # action when slider is used
+            self.variable.set(round(self.slider.get())) # type: ignore # action when slider is used
             
             # as the slider cannot take decimal values, for coefficients the output has to be converted from a percentage to a decimal 
             if self.label in ["Friction Coefficient Brakes", "Friction Coefficient Regen", "Friction Coefficient Tyres"]:
@@ -254,7 +254,7 @@ class widgets:
 
         self.slider = customtkinter.CTkSlider(self.screen, from_=widgetfrom, to=widgetto, command=sliderevent)
         self.slider.grid(row=row, column=column, padx=10, pady=10)
-        self.variable.set(round(self.slider.get(),2))
+        self.variable.set(round(self.slider.get(),2)) # type: ignore
         
 
 
@@ -446,27 +446,56 @@ class simulation:
         
 class resultsscreen:
     def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode((1800, 1000), pygame.RESIZABLE)
-        self.screen.fill("black")
+       # Set up the display
+        self.screenwidth = 1800
+        self.screenheight = 1000
+        self.screen = pygame.display.set_mode((self.screenwidth, self.screenheight))
+        pygame.display.set_caption("Braking Distance Simulator")
     def animation(self):
-        running = True
+ 
+
+        # Load images
         car = pygame.image.load("car.png")
         background = pygame.image.load("background.jpg")
-        car = pygame.transform.scale_by(car,0.5)
-        background = pygame.transform.scale_by(background,0.2)
+
+        # Scale images
+       # car = pygame.transform.scale(car, (100, 50))
+        #background = pygame.transform.scale(background, (800, 600))
+
+        # Clock setup
+        clock = pygame.time.Clock()
+
+        # Background scrolling variables
+        bg_x = 0
+        scroll_speed = 5  # Speed of the background scrolling
+
+        running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            self.screen.fill((255, 255, 255))
-            self.screen.blit(car, (500, 0))
-            self.screen.blit(background, (0, 0))
-            pygame.display.update()
-            clock = pygame.time.Clock()
-        clock.tick(60)
-        pygame.quit()
 
+            # Update background position
+            bg_x -= scroll_speed
+            if bg_x <= -background.get_width():
+                bg_x = 0
+
+            # Draw background (two instances for seamless scrolling)
+            self.screen.fill((255, 255, 255))
+            self.screen.blit(background, (bg_x, 0))
+            self.screen.blit(background, (bg_x + background.get_width(), 0))
+
+            # Draw car
+            car_x = 500
+            car_y = self.screenheight - car.get_height() - 50  # Place the car near the bottom
+            self.screen.blit(car, (car_x, car_y))
+
+            # Update the display
+            pygame.display.update()
+            clock.tick(60)
+
+        # Quit Pygame
+        pygame.quit()
 
 def main():
 
