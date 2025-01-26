@@ -447,17 +447,21 @@ class simulation:
 class resultsscreen:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((2500, 1000), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((1800, 1000), pygame.RESIZABLE)
         self.screen.fill("black")
     def animation(self):
         running = True
         car = pygame.image.load("car.png")
+        background = pygame.image.load("background.jpg")
+        car = pygame.transform.scale_by(car,0.5)
+        background = pygame.transform.scale_by(background,0.2)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             self.screen.fill((255, 255, 255))
-            self.screen.blit(car, (100, 100))
+            self.screen.blit(car, (500, 0))
+            self.screen.blit(background, (0, 0))
             pygame.display.update()
             clock = pygame.time.Clock()
         clock.tick(60)
