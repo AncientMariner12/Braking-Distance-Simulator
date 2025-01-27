@@ -233,10 +233,11 @@ class inputscreen:
             print("Before stopingtime")
             runsimulation.stopingtime()
             print("After stopingtime")
-            print(runsimulation.returnvalues())
+            simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock 
             print("Completed simulation")
-            outputscreen = resultsscreen()
+            outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue())
             outputscreen.animation()
+            
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -441,11 +442,19 @@ class simulation:
         if self.Runtemp == True:
             return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.tempchange, self.maxtemp, self.heatgen, self.islock)
         else:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock)
 
         
-class resultsscreen:
-    def __init__(self):
+class resultsscreen():
+    def __init__(self,brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, islock, initalvelocity):
+        # define varables 
+        self.brakeingdistance = brakeingdistance
+        self.stoppingdistance = stoppingdistance
+        self.brakeingtime = brakeingtime
+        self.stoppingtime = stoppingtime
+        self.islock = islock
+        self.initalvelocity = initalvelocity
+
        # Set up the display
         self.screenwidth = 1800
         self.screenheight = 1000
@@ -457,9 +466,14 @@ class resultsscreen:
         # Load images
         car = pygame.image.load("car.png")
         background = pygame.image.load("background.jpg")
+        leftwheel = pygame.image.load("wheel.png")
+        rightwheel = pygame.image.load("wheel.png")
 
         # Scale images
-       # car = pygame.transform.scale(car, (100, 50))
+        car = pygame.transform.scale_by(car, 0.5)
+        leftwheel = pygame.transform.scale_by(leftwheel, 0.5)
+        rightwheel = pygame.transform.scale_by(rightwheel, 0.5)
+
         #background = pygame.transform.scale(background, (800, 600))
 
         # Clock setup
@@ -480,16 +494,24 @@ class resultsscreen:
             if bg_x <= -background.get_width():
                 bg_x = 0
 
-            # Draw background (two instances for seamless scrolling)
+            # Draw background (two instances for scrolling)
             self.screen.fill((255, 255, 255))
             self.screen.blit(background, (bg_x, 0))
             self.screen.blit(background, (bg_x + background.get_width(), 0))
+            
 
             # Draw car
             car_x = 500
-            car_y = self.screenheight - car.get_height() - 50  # Place the car near the bottom
+            car_y = self.screenheight - car.get_height() - 450  # Place the car on the road
             self.screen.blit(car, (car_x, car_y))
+            leftwheel_x = 580
+            rightwheel_x = 1033
+            leftwheel_y = self.screenheight - car.get_height() - 146
+            rightwheel_y = self.screenheight - car.get_height() - 146 
+            self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
+            self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
 
+            pygame.transform.rotate(leftwheel, 10)
             # Update the display
             pygame.display.update()
             clock.tick(60)
