@@ -496,8 +496,8 @@ class resultsscreen():
 
             # Draw background (two instances for scrolling)
             self.screen.fill((255, 255, 255))
-            self.screen.blit(background, (bg_x, 0))
-            self.screen.blit(background, (bg_x + background.get_width(), 0))
+            self.screen.blit(background, (bg_x, -200))
+            self.screen.blit(background, (bg_x + background.get_width(), -200))
             
 
             # Draw car
@@ -510,6 +510,10 @@ class resultsscreen():
             rightwheel_y = self.screenheight - car.get_height() - 146 
             self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
             self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
+
+            # makeing the wheels rotate
+            rightwheel = pygame.transform.rotate(rightwheel, 10)
+            leftwheel = pygame.transform.rotate(leftwheel, 10)
 
             pygame.transform.rotate(leftwheel, 10)
             # Update the display
