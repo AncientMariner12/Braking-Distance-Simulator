@@ -525,7 +525,7 @@ class resultsscreen():
 
             # Update the display
             pygame.display.update()
-            clock.tick(1)
+            clock.tick(60)
 
         # Quit Pygame
         pygame.quit()
