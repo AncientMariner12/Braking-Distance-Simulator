@@ -512,13 +512,20 @@ class resultsscreen():
             self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
 
             # makeing the wheels rotate
-            rightwheel = pygame.transform.rotate(rightwheel, 10)
-            leftwheel = pygame.transform.rotate(leftwheel, 10)
+            rightloc = rightwheel.get_rect().center
+            leftloc = leftwheel.get_rect().center
+            print(rightloc)
+            print(leftloc)
+            rightwheel = pygame.transform.rotate(rightwheel, -100)
+            leftwheel = pygame.transform.rotate(leftwheel, -100)
+            rightwheel.get_rect().center = (54,54)
+            leftwheel.get_rect().center = (54,54)
 
-            pygame.transform.rotate(leftwheel, 10)
+
+
             # Update the display
             pygame.display.update()
-            clock.tick(60)
+            clock.tick(1)
 
         # Quit Pygame
         pygame.quit()
