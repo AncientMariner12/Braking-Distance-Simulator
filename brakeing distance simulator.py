@@ -462,7 +462,7 @@ class resultsscreen():
         pygame.display.set_caption("Braking Distance Simulator")
     def animation(self):
  
-
+        frame = 0
         # Load images
         car = pygame.image.load("car.png")
         background = pygame.image.load("background.jpg")
@@ -508,19 +508,22 @@ class resultsscreen():
             rightwheel_x = 1033
             leftwheel_y = self.screenheight - car.get_height() - 146
             rightwheel_y = self.screenheight - car.get_height() - 146 
-            self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
-            self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
 
             # makeing the wheels rotate
-            rightloc = rightwheel.get_rect().center
-            leftloc = leftwheel.get_rect().center
-            print(rightloc)
-            print(leftloc)
-            rightwheel = pygame.transform.rotate(rightwheel, -100)
-            leftwheel = pygame.transform.rotate(leftwheel, -100)
-            rightwheel.get_rect().center = (54,54)
-            leftwheel.get_rect().center = (54,54)
+            defultrightwheelpos = (rightwheel_x, rightwheel_y)
+            defultleftwheelpos = (leftwheel_x, leftwheel_y)
 
+
+            rightwheel1 = pygame.transform.rotate(rightwheel, -frame*10)
+            leftwheel1 = pygame.transform.rotate(leftwheel, -frame*10)
+            
+            
+            self.screen.blit(leftwheel1, (leftwheel_x, leftwheel_y))
+            self.screen.blit(rightwheel1, (rightwheel_x, rightwheel_y))
+            print(rightwheel.get_rect().center)
+            print(leftwheel.get_rect().center)
+    
+            frame = frame +1
 
 
             # Update the display
