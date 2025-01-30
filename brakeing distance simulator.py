@@ -474,8 +474,6 @@ class resultsscreen():
         leftwheel = pygame.transform.scale_by(leftwheel, 0.5)
         rightwheel = pygame.transform.scale_by(rightwheel, 0.5)
 
-        #background = pygame.transform.scale(background, (800, 600))
-
         # Clock setup
         clock = pygame.time.Clock()
 
@@ -509,22 +507,18 @@ class resultsscreen():
             leftwheel_y = self.screenheight - car.get_height() - 146
             rightwheel_y = self.screenheight - car.get_height() - 146 
 
-            # makeing the wheels rotate
-            defultrightwheelpos = (rightwheel_x, rightwheel_y)
-            defultleftwheelpos = (leftwheel_x, leftwheel_y)
+            # Make the wheels rotate
+            rightwheelrotated = pygame.transform.rotate(rightwheel, -frame * 10)
+            leftwheelrotated = pygame.transform.rotate(leftwheel, -frame * 10)
 
+            # Calculate new positions to keep the wheels centered
+            rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
+            leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
 
-            rightwheel1 = pygame.transform.rotate(rightwheel, -frame*10)
-            leftwheel1 = pygame.transform.rotate(leftwheel, -frame*10)
-            
-            
-            self.screen.blit(leftwheel1, (leftwheel_x, leftwheel_y))
-            self.screen.blit(rightwheel1, (rightwheel_x, rightwheel_y))
-            print(rightwheel.get_rect().center)
-            print(leftwheel.get_rect().center)
-    
-            frame = frame +1
+            self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
+            self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
 
+            frame += 1
 
             # Update the display
             pygame.display.update()
