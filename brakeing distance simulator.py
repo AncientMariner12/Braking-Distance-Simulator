@@ -480,6 +480,7 @@ class resultsscreen():
         # Background scrolling variables
         bg_x = 0
         scroll_speed = 5  # Speed of the background scrolling
+        deceliration = self.initalvelocity / self.brakeingtime
 
         running = True
         while running:
@@ -512,7 +513,8 @@ class resultsscreen():
             leftwheelrotated = pygame.transform.rotate(leftwheel, -frame * 10)
 
             # Calculate new positions to keep the wheels centered
-            rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
+
+            rightwheelrect = rightwheelrotated.get_rect(center=(+ rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
             leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
 
             self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
