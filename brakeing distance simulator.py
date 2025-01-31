@@ -480,7 +480,7 @@ class resultsscreen():
         # Background scrolling variables
         bg_x = 0
         scroll_speed = 5  # Speed of the background scrolling
-        deceliration = self.initalvelocity / self.brakeingtime
+       # deceliration = self.initalvelocity / self.brakeingtime
 
         running = True
         while running:
