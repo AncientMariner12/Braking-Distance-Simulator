@@ -2,6 +2,7 @@
 import pygame
 import tkinter
 import customtkinter
+import math
 
 
 
@@ -479,8 +480,9 @@ class resultsscreen():
 
         # Background scrolling variables
         bg_x = 0
-        scroll_speed = 5  # Speed of the background scrolling
-       # deceliration = self.initalvelocity / self.brakeingtime
+        #scroll_speed = 5  test code
+        deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
+        deceliration = deceliration / 60 #converts the deceliration to per frame
 
         running = True
         while running:
@@ -488,8 +490,13 @@ class resultsscreen():
                 if event.type == pygame.QUIT:
                     running = False
 
+            #update the deceliration of the car
+            currentvelocity = float(self.initalvelocity) - (deceliration * frame)
+            if currentvelocity <= 0:
+                currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
+
             # Update background position
-            bg_x -= scroll_speed
+            bg_x -= currentvelocity
             if bg_x <= -background.get_width():
                 bg_x = 0
 
@@ -508,9 +515,13 @@ class resultsscreen():
             leftwheel_y = self.screenheight - car.get_height() - 146
             rightwheel_y = self.screenheight - car.get_height() - 146 
 
+            #calculate the rotation of the wheels
+            circumference = rightwheel.get_height() * math.pi
+            rotationangle = 360 * ((currentvelocity /(1/60))/ (circumference)) 
+
             # Make the wheels rotate
-            rightwheelrotated = pygame.transform.rotate(rightwheel, -frame * 10)
-            leftwheelrotated = pygame.transform.rotate(leftwheel, -frame * 10)
+            rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle)
+            leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle)
 
             # Calculate new positions to keep the wheels centered
 
