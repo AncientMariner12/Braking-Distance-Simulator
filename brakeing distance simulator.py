@@ -433,12 +433,14 @@ class simulation:
 
             popup.mainloop()  # Start the popup event loop
             self.popup_done.wait()  # Wait for the popup to be submitted
+            popup.quit()  # Quit the popup event loop
 
         self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
 
     def stopingtime(self): #calculates the stopping time of the vehicle
         denominator = (self.fricitioncobrakes + self.frictioncoregen + self.Grade)* self.Gravity
         self.brakeingtime = self.Velocity / denominator
+        
         #applies the multiplier if it is enabled
         if self.usemultiplier == True:
             self.brakeingtime = self.brakeingtime * self.multiplier
