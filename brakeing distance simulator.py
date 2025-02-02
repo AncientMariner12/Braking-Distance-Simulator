@@ -3,7 +3,7 @@ import pygame
 import tkinter
 import customtkinter
 import math
-
+import threading  
 
 
 class inputscreen:
@@ -237,8 +237,8 @@ class inputscreen:
             simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock 
             print("Completed simulation")
             outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue())
-            outputscreen.animation()
-            
+            simulation_thread = threading.Thread(target=outputscreen.animation)
+            simulation_thread.start()
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -391,11 +391,15 @@ class simulation:
 
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
         else:
+            self.popup_done = threading.Event()  # Event to wait for popup submission
+
             def popupevent(): # button event loop
                 try:
                     entered_value = popuptextentry.get()
                     print(f"Entered value: {entered_value}")
-                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 *float(entered_value)) # calculates the tempature change of the disk
+                    self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * float(entered_value)) # calculates the tempature change of the disk
+                    self.popup_done.set()  # Signal that the popup is done
+                    popup.destroy()  # Close the popup window
 
                 except Exception as e:
                     print(f"Error: {e}")
@@ -424,10 +428,11 @@ class simulation:
             popuptextentry.grid(row=0, column=1, padx=10, pady=10)
             
             #adds a button to the screen
-            button = customtkinter.CTkButton(popup, text="Submit", command=popupevent())
+            button = customtkinter.CTkButton(popup, text="Submit", command=lambda: popupevent())
             button.grid(row=0, column=2, padx=10, pady=10)
 
- 
+            popup.mainloop()  # Start the popup event loop
+            self.popup_done.wait()  # Wait for the popup to be submitted
 
         self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
 
@@ -500,6 +505,7 @@ class resultsscreen():
             if bg_x <= -background.get_width():
                 bg_x = 0
 
+
             # Draw background (two instances for scrolling)
             self.screen.fill((255, 255, 255))
             self.screen.blit(background, (bg_x, -200))
@@ -517,7 +523,7 @@ class resultsscreen():
 
             #calculate the rotation of the wheels
             circumference = rightwheel.get_height() * math.pi
-            rotationangle = 360 * ((currentvelocity /(1/60))/ (circumference)) 
+            rotationangle = 360 *  ((60 *currentvelocity) / circumference) 
 
             # Make the wheels rotate
             rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle)
@@ -530,7 +536,7 @@ class resultsscreen():
 
             self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
             self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
-
+            print(currentvelocity, rotationangle)
             frame += 1
 
             # Update the display
