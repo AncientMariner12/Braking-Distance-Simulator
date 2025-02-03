@@ -400,6 +400,7 @@ class simulation:
                     self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * float(entered_value)) # calculates the tempature change of the disk
                     self.popup_done.set()  # Signal that the popup is done
                     popup.destroy()  # Close the popup window
+                    popup.quit()  # Quit the popup event loop
 
                 except Exception as e:
                     print(f"Error: {e}")
@@ -433,7 +434,7 @@ class simulation:
 
             popup.mainloop()  # Start the popup event loop
             self.popup_done.wait()  # Wait for the popup to be submitted
-            popup.quit()  # Quit the popup event loop
+
 
         self.maxtemp = self.tempchange + self.Ambienttemp # calculates the max tempature of the disk
 
@@ -491,6 +492,10 @@ class resultsscreen():
         deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
         deceliration = deceliration / 60 #converts the deceliration to per frame
 
+        # Initialize font
+        pygame.font.init()
+        font = pygame.font.SysFont('Arial', 30)
+
         running = True
         while running:
             for event in pygame.event.get():
@@ -522,22 +527,34 @@ class resultsscreen():
             rightwheel_x = 1033
             leftwheel_y = self.screenheight - car.get_height() - 146
             rightwheel_y = self.screenheight - car.get_height() - 146 
+            if self.islock == False:
+                #calculate the rotation of the wheels
+                circumference = rightwheel.get_height() * math.pi
+                rotationangle = 360 *  ((60 *currentvelocity) / circumference) 
 
-            #calculate the rotation of the wheels
-            circumference = rightwheel.get_height() * math.pi
-            rotationangle = 360 *  ((60 *currentvelocity) / circumference) 
+                # Make the wheels rotate
+                rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle)
+                leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle)
 
-            # Make the wheels rotate
-            rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle)
-            leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle)
+                # Calculate new positions to keep the wheels centered
 
-            # Calculate new positions to keep the wheels centered
+                rightwheelrect = rightwheelrotated.get_rect(center=(+ rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
+                leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
+                # create  air speed meter
+                wheelspeed = font.render(f'Speedometer: {currentvelocity:.2f} m/s', True, (0, 0, 0))
+            else:
 
-            rightwheelrect = rightwheelrotated.get_rect(center=(+ rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
-            leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
+                wheelspeed = font.render(f'Speedometer: {"0":.2f} m/s', True, (0, 0, 0))
 
             self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
             self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
+            
+            self.screen.blit(wheelspeed, (10, self.screenheight - 70)) #wheels speed meter
+
+            # create  air speed meter
+            speed_text = font.render(f'Air Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
+            self.screen.blit(speed_text, (10, self.screenheight - 40))
+
             print(currentvelocity, rotationangle)
             frame += 1
 
