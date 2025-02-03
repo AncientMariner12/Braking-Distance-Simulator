@@ -492,13 +492,14 @@ class resultsscreen():
         deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
         deceliration = deceliration / 60 #converts the deceliration to per frame
 
-        reactionframes = int((self.stoppingtime - self.brakeingtime) *60)  # Calculate the number of frames for the reaction time
+        reactionframes = round((self.stoppingtime - self.brakeingtime)*60)  # Calculate the number of frames for the reaction time
 
         # Initialize font
         pygame.font.init()
         font = pygame.font.SysFont('Arial', 30)
 
-        distance_traveled = 0  # Initialize distance traveled
+        distancetraveled = 0  # Initialize distance traveled
+        starttime = pygame.time.get_ticks()  # Initialize start time
 
         running = True
         while running:
@@ -513,14 +514,13 @@ class resultsscreen():
                     currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
             else:
                 currentvelocity = float(self.initalvelocity)
-                deceliration = 0
             # Update background position
             bg_x -= currentvelocity
             if bg_x <= -background.get_width():
                 bg_x = 0
 
             # Calculate distance traveled
-            distance_traveled += currentvelocity / 60  # Assuming 60 FPS
+            distancetraveled += currentvelocity / 60  # Assuming 60 FPS
 
             # Draw background (two instances for scrolling)
             self.screen.fill((255, 255, 255))
@@ -551,8 +551,8 @@ class resultsscreen():
                 # create  air speed meter
                 wheelspeed = font.render(f'Speedometer: {currentvelocity:.2f} m/s', True, (0, 0, 0))
             else:
-
-                wheelspeed = font.render(f'Speedometer: {"0":.2f} m/s', True, (0, 0, 0))
+                wheelvelcoity = 0
+                wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
 
             self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
             self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
@@ -560,12 +560,18 @@ class resultsscreen():
             self.screen.blit(wheelspeed, (10, self.screenheight - 70)) #wheels speed meter
 
             # create Ground speed meter
-            speed_text = font.render(f'Ground Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
-            self.screen.blit(speed_text, (10, self.screenheight - 40))
+            speedtext = font.render(f'Ground Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
+            self.screen.blit(speedtext, (10, self.screenheight - 40))
 
             # Render the distance traveled text
-            distance_text = font.render(f'Distance Traveled: {distance_traveled:.2f} m', True, (0, 0, 0))
-            self.screen.blit(distance_text, (10, self.screenheight - 100))
+            distancetext = font.render(f'Distance Traveled: {distancetraveled:.2f} m', True, (0, 0, 0))
+            self.screen.blit(distancetext, (10, self.screenheight - 100))
+
+            elapsedtime = (pygame.time.get_ticks() - starttime) / 1000  # Calculate elapsed time in seconds
+
+            # Render the timer text
+            timertext = font.render(f'Time Elapsed: {elapsedtime:.2f} s', True, (0, 0, 0))
+            self.screen.blit(timertext, (10, self.screenheight - 130))
 
             print(currentvelocity, rotationangle)
             frame += 1
