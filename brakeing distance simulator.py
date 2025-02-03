@@ -492,9 +492,13 @@ class resultsscreen():
         deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
         deceliration = deceliration / 60 #converts the deceliration to per frame
 
+        reactionframes = int((self.stoppingtime - self.brakeingtime) *60)  # Calculate the number of frames for the reaction time
+
         # Initialize font
         pygame.font.init()
         font = pygame.font.SysFont('Arial', 30)
+
+        distance_traveled = 0  # Initialize distance traveled
 
         running = True
         while running:
@@ -503,15 +507,20 @@ class resultsscreen():
                     running = False
 
             #update the deceliration of the car
-            currentvelocity = float(self.initalvelocity) - (deceliration * frame)
-            if currentvelocity <= 0:
-                currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
-
+            if frame > reactionframes:
+                currentvelocity = float(self.initalvelocity) - (deceliration * (frame - reactionframes))
+                if currentvelocity <= 0:
+                    currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
+            else:
+                currentvelocity = float(self.initalvelocity)
+                deceliration = 0
             # Update background position
             bg_x -= currentvelocity
             if bg_x <= -background.get_width():
                 bg_x = 0
 
+            # Calculate distance traveled
+            distance_traveled += currentvelocity / 60  # Assuming 60 FPS
 
             # Draw background (two instances for scrolling)
             self.screen.fill((255, 255, 255))
@@ -537,8 +546,7 @@ class resultsscreen():
                 leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle)
 
                 # Calculate new positions to keep the wheels centered
-
-                rightwheelrect = rightwheelrotated.get_rect(center=(+ rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
+                rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
                 leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
                 # create  air speed meter
                 wheelspeed = font.render(f'Speedometer: {currentvelocity:.2f} m/s', True, (0, 0, 0))
@@ -551,9 +559,13 @@ class resultsscreen():
             
             self.screen.blit(wheelspeed, (10, self.screenheight - 70)) #wheels speed meter
 
-            # create  air speed meter
-            speed_text = font.render(f'Air Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
+            # create Ground speed meter
+            speed_text = font.render(f'Ground Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
             self.screen.blit(speed_text, (10, self.screenheight - 40))
+
+            # Render the distance traveled text
+            distance_text = font.render(f'Distance Traveled: {distance_traveled:.2f} m', True, (0, 0, 0))
+            self.screen.blit(distance_text, (10, self.screenheight - 100))
 
             print(currentvelocity, rotationangle)
             frame += 1
