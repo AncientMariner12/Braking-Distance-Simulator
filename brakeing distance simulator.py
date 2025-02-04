@@ -489,8 +489,6 @@ class resultsscreen():
         # Background scrolling variables
         bg_x = 0
         #scroll_speed = 5  test code
-        deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
-        deceliration = deceliration / 60 #converts the deceliration to per frame
 
         reactionframes = round((self.stoppingtime - self.brakeingtime)*60)  # Calculate the number of frames for the reaction time
 
@@ -508,12 +506,17 @@ class resultsscreen():
                     running = False
 
             #update the deceliration of the car
+
+            deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
+            deceliration = deceliration / 60 #converts the deceliration to per frame
+
             if frame > reactionframes:
                 currentvelocity = float(self.initalvelocity) - (deceliration * (frame - reactionframes))
                 if currentvelocity <= 0:
                     currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
             else:
                 currentvelocity = float(self.initalvelocity)
+                deceliration = 0
             # Update background position
             bg_x -= currentvelocity
             if bg_x <= -background.get_width():
