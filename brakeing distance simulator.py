@@ -489,6 +489,8 @@ class resultsscreen():
         # Background scrolling variables
         bg_x = 0
         #scroll_speed = 5  test code
+        deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
+        deceliration = deceliration / 60 #converts the deceliration to per frame
 
         reactionframes = round((self.stoppingtime - self.brakeingtime)*60)  # Calculate the number of frames for the reaction time
 
@@ -506,17 +508,12 @@ class resultsscreen():
                     running = False
 
             #update the deceliration of the car
-
-            deceliration = float(self.initalvelocity) / float(self.brakeingtime) #calculates the deceliration of the car per second
-            deceliration = deceliration / 60 #converts the deceliration to per frame
-
             if frame > reactionframes:
                 currentvelocity = float(self.initalvelocity) - (deceliration * (frame - reactionframes))
                 if currentvelocity <= 0:
                     currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
             else:
                 currentvelocity = float(self.initalvelocity)
-                deceliration = 0
             # Update background position
             bg_x -= currentvelocity
             if bg_x <= -background.get_width():
@@ -542,11 +539,11 @@ class resultsscreen():
             if self.islock == False:
                 #calculate the rotation of the wheels
                 circumference = rightwheel.get_height() * math.pi
-                rotationangle = 360 *  ((60 *currentvelocity) / circumference) 
+                rotationangle = 360 *  (currentvelocity / circumference) 
 
                 # Make the wheels rotate
-                rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle)
-                leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle)
+                rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle* (frame-reactionframes))
+                leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle* (frame - reactionframes))
 
                 # Calculate new positions to keep the wheels centered
                 rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
@@ -581,7 +578,7 @@ class resultsscreen():
 
             # Update the display
             pygame.display.update()
-            clock.tick(60)
+            clock.tick(0)
 
         # Quit Pygame
         pygame.quit()
