@@ -237,7 +237,7 @@ class inputscreen:
             simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock 
             print("Completed simulation")
             if self.Runtemp == True:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[5], self.Ambienttempwidgets.returnvalue())
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue())
             else:
                 outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None)
             simulation_thread = threading.Thread(target=outputscreen.animation)
@@ -454,11 +454,11 @@ class simulation:
         if self.Runtemp == True:
             return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock)
         else:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None)
 
         
 class resultsscreen():
-    def __init__(self,brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, islock, initalvelocity, maxtemp, ambianttemp):
+    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp):
         # define varables 
         self.brakeingdistance = brakeingdistance
         self.stoppingdistance = stoppingdistance
@@ -468,6 +468,7 @@ class resultsscreen():
         self.initalvelocity = initalvelocity
         self.maxtemp = float(maxtemp)  
         self.ambianttemp = float(ambianttemp)
+
 
        # Set up the display
         self.screenwidth = 1800
@@ -588,9 +589,12 @@ class resultsscreen():
 
 
             # the temperature meter if temperature calculations were done
-            if self.maxtemp is not None:
+            if self.maxtemp is not None and currentvelocity > 0 and frame > reactionframes:
                 currenttemp = tempchangeperframe * (frame - reactionframes) + self.ambianttemp
                 temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
+                self.screen.blit(temptext, (10, self.screenheight - 160))
+            else:
+                temptext = font.render(f'Temperature: {self.maxtemp:.2f} °C', True, (0, 0, 0))
                 self.screen.blit(temptext, (10, self.screenheight - 160))
 
 
