@@ -236,7 +236,10 @@ class inputscreen:
             print("After stopingtime")
             simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock 
             print("Completed simulation")
-            outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue())
+            if self.Runtemp == True:
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[5], self.Ambienttempwidgets.returnvalue())
+            else:
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None)
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
 
@@ -449,13 +452,13 @@ class simulation:
     
     def returnvalues(self): #returns the results of the simulation
         if self.Runtemp == True:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.tempchange, self.maxtemp, self.heatgen, self.islock)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock)
         else:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None)
 
         
 class resultsscreen():
-    def __init__(self,brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, islock, initalvelocity):
+    def __init__(self,brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, islock, initalvelocity, maxtemp, ambianttemp):
         # define varables 
         self.brakeingdistance = brakeingdistance
         self.stoppingdistance = stoppingdistance
@@ -463,6 +466,8 @@ class resultsscreen():
         self.stoppingtime = stoppingtime
         self.islock = islock
         self.initalvelocity = initalvelocity
+        self.maxtemp = float(maxtemp)  
+        self.ambianttemp = float(ambianttemp)
 
        # Set up the display
         self.screenwidth = 1800
@@ -500,6 +505,10 @@ class resultsscreen():
 
         distancetraveled = 0  # Initialize distance traveled
         starttime = pygame.time.get_ticks()  # Initialize start time
+
+        # calculate tempature change per frame 
+        if self.maxtemp is not None:
+            tempchangeperframe = (self.maxtemp - self.ambianttemp / self.brakeingtime) / 60
 
         running = True
         while running:
@@ -548,14 +557,18 @@ class resultsscreen():
                 # Calculate new positions to keep the wheels centered
                 rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
                 leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
-                # create  air speed meter
+                # create  wheel speed meter
                 wheelspeed = font.render(f'Speedometer: {currentvelocity:.2f} m/s', True, (0, 0, 0))
-            else:
-                wheelvelcoity = 0
-                wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
 
-            self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
-            self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
+                self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
+                self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
+                print(currentvelocity, rotationangle)
+            else:
+                wheelvelcoity = 0 
+                wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
+                self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
+                self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
+
             
             self.screen.blit(wheelspeed, (10, self.screenheight - 70)) #wheels speed meter
 
@@ -573,12 +586,19 @@ class resultsscreen():
             timertext = font.render(f'Time Elapsed: {elapsedtime:.2f} s', True, (0, 0, 0))
             self.screen.blit(timertext, (10, self.screenheight - 130))
 
-            print(currentvelocity, rotationangle)
+
+            # the temperature meter if temperature calculations were done
+            if self.maxtemp is not None:
+                currenttemp = tempchangeperframe * (frame - reactionframes) + self.ambianttemp
+                temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
+                self.screen.blit(temptext, (10, self.screenheight - 160))
+
+
             frame += 1
 
             # Update the display
             pygame.display.update()
-            clock.tick(0)
+            clock.tick(60)
 
         # Quit Pygame
         pygame.quit()
