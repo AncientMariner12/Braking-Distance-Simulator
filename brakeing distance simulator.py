@@ -569,6 +569,9 @@ class resultsscreen():
                 wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
                 self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
                 self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
+                # Display lock warning
+                lockwarning = font.render('Warning: Wheels Locked!', True, (255, 0, 0))
+                self.screen.blit(lockwarning, (10, self.screenheight - 190))
 
             
             self.screen.blit(wheelspeed, (10, self.screenheight - 70)) #wheels speed meter
