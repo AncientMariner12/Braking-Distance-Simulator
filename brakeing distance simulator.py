@@ -509,7 +509,7 @@ class resultsscreen():
 
         # calculate tempature change per frame 
         if self.maxtemp is not None:
-            tempchangeperframe = (self.maxtemp - self.ambianttemp / self.brakeingtime) / 60
+            tempchangeperframe = ((self.maxtemp - self.ambianttemp) / self.brakeingtime) / 60
 
         running = True
         while running:
