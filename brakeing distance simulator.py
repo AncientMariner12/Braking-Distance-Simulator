@@ -383,13 +383,13 @@ class simulation:
         #relates a melting point to a heat capacity, this process is not 100% accurate but is a good estimate
         #then calculates the tempature change of the disk
 
-        if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint < 660:
+        if self.Brakemeltingpoint > 500 and self.Brakemeltingpoint <= 660:
             self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * 887)
 
-        elif self.Brakemeltingpoint > 1100 and self.Brakemeltingpoint < 1200:
+        elif self.Brakemeltingpoint > 1100 and self.Brakemeltingpoint <= 1200:
             self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * 920)
 
-        elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint < 1800: 
+        elif self.Brakemeltingpoint > 1200 and self.Brakemeltingpoint <= 1800: 
             self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * 554)
 
         #if the tempature is not in one of the ranges above the user will be asked to input the heat capacity of the disk
@@ -621,4 +621,3 @@ def main():
 main()
 
 
-main()
