@@ -475,6 +475,15 @@ class resultsscreen():
         self.screenheight = 1000
         self.screen = pygame.display.set_mode((self.screenwidth, self.screenheight))
         pygame.display.set_caption("Braking Distance Simulator")
+        self.paused = False
+        self.restart = False
+
+    def toggle_pause(self):
+        self.paused = not self.paused
+
+    def restart_animation(self):
+        self.restart = True
+
     def animation(self):
  
         frame = 0
@@ -511,97 +520,132 @@ class resultsscreen():
         if self.maxtemp is not None:
             tempchangeperframe = ((self.maxtemp - self.ambianttemp) / self.brakeingtime) / 60
 
+        # Initialize buttons
+        button_width = 100
+        button_height = 100
+        pause_button = pygame.Rect(1680, self.screenheight - button_height - 100, button_width, button_height)
+        restart_button = pygame.Rect(1570, self.screenheight - button_height - 100, button_width, button_height)
+
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if pause_button.collidepoint(event.pos):
+                        self.toggle_pause()
+                    elif restart_button.collidepoint(event.pos):
+                        self.restart_animation()
 
-            #update the deceliration of the car
-            if frame > reactionframes:
-                currentvelocity = float(self.initalvelocity) - (deceliration * (frame - reactionframes))
-                if currentvelocity <= 0:
-                    currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
-            else:
-                currentvelocity = float(self.initalvelocity)
-            # Update background position
-            bg_x -= currentvelocity
-            if bg_x <= -background.get_width():
-                bg_x = 0
+            if self.restart:
+                frame = 0
+                distancetraveled = 0
+                starttime = pygame.time.get_ticks()
+                self.restart = False
 
-            # Calculate distance traveled
-            distancetraveled += currentvelocity / 60  # Assuming 60 FPS
+            if not self.paused:
+                #update the deceliration of the car
+                if frame > reactionframes:
+                    currentvelocity = float(self.initalvelocity) - (deceliration * (frame - reactionframes))
+                    if currentvelocity <= 0:
+                        currentvelocity = 0 #stops the car if it has reached 0 velocity so it dosent go into negative velocity
+                else:
+                    currentvelocity = float(self.initalvelocity)
+                # Update background position
+                bg_x -= currentvelocity
+                if bg_x <= -background.get_width():
+                    bg_x = 0
 
-            # Draw background (two instances for scrolling)
-            self.screen.fill((255, 255, 255))
-            self.screen.blit(background, (bg_x, -200))
-            self.screen.blit(background, (bg_x + background.get_width(), -200))
-            
+                # Calculate distance traveled
+                distancetraveled += currentvelocity / 60  # Assuming 60 FPS
 
-            # Draw car
-            car_x = 500
-            car_y = self.screenheight - car.get_height() - 450  # Place the car on the road
-            self.screen.blit(car, (car_x, car_y))
-            leftwheel_x = 580
-            rightwheel_x = 1033
-            leftwheel_y = self.screenheight - car.get_height() - 146
-            rightwheel_y = self.screenheight - car.get_height() - 146 
-            if self.islock == False:
-                #calculate the rotation of the wheels
-                circumference = rightwheel.get_height() * math.pi
-                rotationangle = 360 *  (currentvelocity / circumference) 
+                # Draw background (two instances for scrolling)
+                self.screen.fill((255, 255, 255))
+                self.screen.blit(background, (bg_x, -200))
+                self.screen.blit(background, (bg_x + background.get_width(), -200))
+                
 
-                # Make the wheels rotate
-                rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle* (frame-reactionframes))
-                leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle* (frame - reactionframes))
+                # Draw car
+                car_x = 500
+                car_y = self.screenheight - car.get_height() - 450  # Place the car on the road
+                self.screen.blit(car, (car_x, car_y))
+                leftwheel_x = 580
+                rightwheel_x = 1033
+                leftwheel_y = self.screenheight - car.get_height() - 146
+                rightwheel_y = self.screenheight - car.get_height() - 146 
+                if self.islock == False:
+                    #calculate the rotation of the wheels
+                    circumference = rightwheel.get_height() * math.pi
+                    rotationangle = 360 *  (currentvelocity / circumference) 
 
-                # Calculate new positions to keep the wheels centered
-                rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
-                leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
-                # create  wheel speed meter
-                wheelspeed = font.render(f'Speedometer: {currentvelocity:.2f} m/s', True, (0, 0, 0))
+                    # Make the wheels rotate
+                    rightwheelrotated = pygame.transform.rotate(rightwheel, rotationangle* (frame-reactionframes))
+                    leftwheelrotated = pygame.transform.rotate(leftwheel, rotationangle* (frame - reactionframes))
 
-                self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
-                self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
-                print(currentvelocity, rotationangle)
-            else:
-                wheelvelcoity = 0 
-                wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
-                self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
-                self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
-                # Display lock warning
-                lockwarning = font.render('Warning: Wheels Locked!', True, (255, 0, 0))
-                self.screen.blit(lockwarning, (10, self.screenheight - 190))
+                    # Calculate new positions to keep the wheels centered
+                    rightwheelrect = rightwheelrotated.get_rect(center=(rightwheel_x + rightwheel.get_width() // 2, rightwheel_y + rightwheel.get_height() // 2))
+                    leftwheelrect = leftwheelrotated.get_rect(center=(leftwheel_x + leftwheel.get_width() // 2, leftwheel_y + leftwheel.get_height() // 2))
+                    # create  wheel speed meter
+                    wheelspeed = font.render(f'Speedometer: {currentvelocity:.2f} m/s', True, (0, 0, 0))
 
-            
-            self.screen.blit(wheelspeed, (10, self.screenheight - 70)) #wheels speed meter
+                    self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
+                    self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
+                    print(currentvelocity, rotationangle)
+                else:
+                    wheelvelcoity = 0 
+                    wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
+                    self.screen.blit(leftwheel, (leftwheel_x, leftwheel_y))
+                    self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
+                    # Display lock warning
+                    lockwarning = font.render('Warning: Wheels Locked!', True, (255, 0, 0))
+                    self.screen.blit(lockwarning, (10, self.screenheight - 190))
 
-            # create Ground speed meter
-            speedtext = font.render(f'Ground Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
-            self.screen.blit(speedtext, (10, self.screenheight - 40))
+                
+                self.screen.blit(wheelspeed, (10, self.screenheight - 100)) #wheels speed meter
 
-            # Render the distance traveled text
-            distancetext = font.render(f'Distance Traveled: {distancetraveled:.2f} m', True, (0, 0, 0))
-            self.screen.blit(distancetext, (10, self.screenheight - 100))
+                # create Ground speed meter
+                speedtext = font.render(f'Ground Speed: {currentvelocity:.2f} m/s', True, (0, 0, 0))
+                self.screen.blit(speedtext, (10, self.screenheight - 70))
 
-            elapsedtime = (pygame.time.get_ticks() - starttime) / 1000  # Calculate elapsed time in seconds
+                # Render the distance traveled text
+                distancetext = font.render(f'Distance Traveled: {distancetraveled:.2f} m', True, (0, 0, 0))
+                self.screen.blit(distancetext, (10, self.screenheight - 130))
 
-            # Render the timer text
-            timertext = font.render(f'Time Elapsed: {elapsedtime:.2f} s', True, (0, 0, 0))
-            self.screen.blit(timertext, (10, self.screenheight - 130))
+                elapsedtime = (pygame.time.get_ticks() - starttime) / 1000  # Calculate elapsed time in seconds
 
-
-            # the temperature meter if temperature calculations were done
-            if self.maxtemp is not None and currentvelocity > 0 and frame > reactionframes:
-                currenttemp = tempchangeperframe * (frame - reactionframes) + self.ambianttemp
-                temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
-                self.screen.blit(temptext, (10, self.screenheight - 160))
-            else:
-                temptext = font.render(f'Temperature: {self.maxtemp:.2f} °C', True, (0, 0, 0))
-                self.screen.blit(temptext, (10, self.screenheight - 160))
+                # Render the timer text
+                timertext = font.render(f'Time Elapsed: {elapsedtime:.2f} s', True, (0, 0, 0))
+                self.screen.blit(timertext, (10, self.screenheight - 160))
 
 
-            frame += 1
+                # the temperature meter if temperature calculations were done
+                if self.maxtemp is not None and currentvelocity > 0 and frame > reactionframes:
+                    currenttemp = tempchangeperframe * (frame - reactionframes) + self.ambianttemp
+                    temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
+                    self.screen.blit(temptext, (10, self.screenheight - 190))
+                else:
+                    temptext = font.render(f'Temperature: {self.maxtemp:.2f} °C', True, (0, 0, 0))
+                    self.screen.blit(temptext, (10, self.screenheight - 190))
+
+
+                frame += 1
+
+            # Draw buttons
+            pygame.draw.rect(self.screen, (0, 255, 0), pause_button)
+            pygame.draw.rect(self.screen, (255, 0, 0), restart_button)
+            pause_text = font.render('Pause' if not self.paused else 'Play', True, (0, 0, 0))
+            restart_text = font.render('Restart', True, (0, 0, 0))
+            pause_text_rect = pause_text.get_rect(center=pause_button.center)
+            restart_text_rect = restart_text.get_rect(center=restart_button.center)
+            self.screen.blit(pause_text, pause_text_rect)
+            self.screen.blit(restart_text, restart_text_rect)
+
+            # Draw text
+            self.screen.blit(wheelspeed, (10, self.screenheight - 100))  # wheels speed meter
+            self.screen.blit(speedtext, (10, self.screenheight - 70))  # ground speed meter
+            self.screen.blit(distancetext, (10, self.screenheight - 130))  # distance traveled text
+            self.screen.blit(timertext, (10, self.screenheight - 160))  # timer text
+            self.screen.blit(temptext, (10, self.screenheight - 190))  # temperature text
 
             # Update the display
             pygame.display.update()
