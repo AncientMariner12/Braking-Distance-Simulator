@@ -598,7 +598,7 @@ class resultsscreen():
                     self.screen.blit(rightwheel, (rightwheel_x, rightwheel_y))
                     # Display lock warning
                     lockwarning = font.render('Warning: Wheels Locked!', True, (255, 0, 0))
-                    self.screen.blit(lockwarning, (10, self.screenheight - 190))
+                    self.screen.blit(lockwarning, (10, self.screenheight - 220))
 
                 
                 self.screen.blit(wheelspeed, (10, self.screenheight - 100)) #wheels speed meter
@@ -621,8 +621,11 @@ class resultsscreen():
                 # the temperature meter if temperature calculations were done
                 if self.maxtemp is not None and currentvelocity > 0 and frame > reactionframes:
                     currenttemp = tempchangeperframe * (frame - reactionframes) + self.ambianttemp
+                    if self.islock == True: # if the wheels have locked the tempature dosnt change 
+                        currenttemp = self.maxtemp
                     temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                     self.screen.blit(temptext, (10, self.screenheight - 190))
+
                 else:
                     temptext = font.render(f'Temperature: {self.maxtemp:.2f} °C', True, (0, 0, 0))
                     self.screen.blit(temptext, (10, self.screenheight - 190))
@@ -653,6 +656,8 @@ class resultsscreen():
 
         # Quit Pygame
         pygame.quit()
+        def results():
+            pass
 
 def main():
 
