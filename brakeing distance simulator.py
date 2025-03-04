@@ -221,7 +221,7 @@ class inputscreen:
         pass
 
 
-    def simulate(self):
+    def simulate(self): #manages  the simulation by calling each method and class as reqired 
         print("Starting simulation")
         failedlist = self.validate()
         if failedlist is None:
@@ -234,14 +234,16 @@ class inputscreen:
             print("Before stopingtime")
             runsimulation.stopingtime()
             print("After stopingtime")
-            simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock 
+            simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock, brakemelting point  
             print("Completed simulation")
             if self.Runtemp == True:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue())
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue(), simulatedvalues[8])
             else:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None)
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None)
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
+            resulsscreenthread = threading.Thread(target=outputscreen.results)
+            resulsscreenthread.start()
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -452,13 +454,13 @@ class simulation:
     
     def returnvalues(self): #returns the results of the simulation
         if self.Runtemp == True:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock, self.Brakemeltingpoint)
         else:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None, None)
 
         
 class resultsscreen():
-    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp):
+    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp, brakemeltingpoint):
         # define varables 
         self.brakeingdistance = brakeingdistance
         self.stoppingdistance = stoppingdistance
@@ -468,6 +470,7 @@ class resultsscreen():
         self.initalvelocity = initalvelocity
         self.maxtemp = float(maxtemp)  
         self.ambianttemp = float(ambianttemp)
+        self.brakemeltingpoint = float(brakemeltingpoint)
 
 
        # Set up the display
@@ -625,13 +628,26 @@ class resultsscreen():
                         currenttemp = self.maxtemp
                     temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                     self.screen.blit(temptext, (10, self.screenheight - 190))
+                                    # check if brakes have failed due to tempature
+                    if currenttemp > self.brakemeltingpoint:
+                        self.screen.blit(font.render('Warning: Brakes have failed due to high temperature!', True, (255, 0, 0)), (10, self.screenheight - 250)) 
+                        wontstop = [True, "Brakes failed due to tempature"]
+
 
                 else:
-                    temptext = font.render(f'Temperature: {self.maxtemp:.2f} °C', True, (0, 0, 0))
-                    self.screen.blit(temptext, (10, self.screenheight - 190))
+                    try:
+                        temptext = font.render(f'Temperature: {self.ambianttemp:.2f} °C', True, (0, 0, 0))
+                        self.screen.blit(temptext, (10, self.screenheight - 190))
+                    except:
+                        pass
+            
 
+                #stops the simulation if the car has stopped
+                if distancetraveled >= self.stoppingdistance:
+                    self.paused = True
+                    print("Car has stopped")
+                    return()
 
-                frame += 1
 
             # Draw buttons
             pygame.draw.rect(self.screen, (0, 255, 0), pause_button)
@@ -650,14 +666,16 @@ class resultsscreen():
             self.screen.blit(timertext, (10, self.screenheight - 160))  # timer text
             self.screen.blit(temptext, (10, self.screenheight - 190))  # temperature text
 
+            frame += 1
             # Update the display
             pygame.display.update()
             clock.tick(60)
 
         # Quit Pygame
         pygame.quit()
-        def results():
-            pass
+    def results(self):
+        print("results")
+        pass
 
 def main():
 
