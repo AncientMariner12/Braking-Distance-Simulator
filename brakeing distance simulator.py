@@ -237,9 +237,9 @@ class inputscreen:
             simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock, brakemelting point  
             print("Completed simulation")
             if self.Runtemp == True:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue(), simulatedvalues[8])
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue(), simulatedvalues[8], simulatedvalues[9])
             else:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None)
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None, simulatedvalues[9])
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
             resulsscreenthread = threading.Thread(target=outputscreen.results)
@@ -323,6 +323,7 @@ class widgets:
 
 class simulation:
     def __init__(self,  Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Mass, Grade, Clampforce, usemultiplier, multiplier):
+        #initaliseation method
         self.Runtemp = Runtemp
         print(self.Runtemp)
         if self.Runtemp == True:
@@ -343,6 +344,7 @@ class simulation:
         self.Clampforce = float(Clampforce)
         self.usemultiplier = usemultiplier
         self.tempchange = 0
+        self.stop = True
         if usemultiplier == True:
             self.multiplier = float(multiplier)
 
@@ -364,11 +366,15 @@ class simulation:
 
         if self.islock == False: #if the wheels have not locked
             denominator = 2 * self.Gravity * (totalcoeficent  + self.Grade)
+            if denominator <= 0: #if the denominator is 0 the vehicle will not stop
+                self.stop == False
             numerator = self.Velocity ** 2
             self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
             denominator = (totalcoeficent + self.Grade) * self.Mass * self.Gravity
+            if denominator <= 0: #if the denominator is 0 the vehicle will not stop
+                self.stop == False
             self.brakeingdistance = numerator / denominator
 
         #applys the multiplyer if it is enabled 
@@ -454,13 +460,13 @@ class simulation:
     
     def returnvalues(self): #returns the results of the simulation
         if self.Runtemp == True:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock, self.Brakemeltingpoint)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock, self.Brakemeltingpoint, self.stop)
         else:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None, None)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None, None, self.stop)
 
         
 class resultsscreen():
-    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp, brakemeltingpoint):
+    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp, brakemeltingpoint,stop):
         # define varables 
         self.brakeingdistance = brakeingdistance
         self.stoppingdistance = stoppingdistance
@@ -471,6 +477,7 @@ class resultsscreen():
         self.maxtemp = float(maxtemp)  
         self.ambianttemp = float(ambianttemp)
         self.brakemeltingpoint = float(brakemeltingpoint)
+        self.stop = stop
 
 
        # Set up the display
@@ -546,7 +553,7 @@ class resultsscreen():
                 starttime = pygame.time.get_ticks()
                 self.restart = False
 
-            if not self.paused:
+            if not self.paused and self.stop:
                 #update the deceliration of the car
                 if frame > reactionframes:
                     currentvelocity = float(self.initalvelocity) - (deceliration * (frame - reactionframes))
@@ -647,7 +654,12 @@ class resultsscreen():
                     self.paused = True
                     print("Car has stopped")
                     return()
-
+                
+            elif not self.stop:
+                self.screen.fill((255, 255, 255))  # Clear the screen
+                stoppingwarning = font.render("Warning: Car will not stop. Simulation paused, please input different values.", True, (255, 0, 0))
+                self.screen.blit(stoppingwarning, (10, self.screenheight - 250))
+                self.paused = True
 
             # Draw buttons
             pygame.draw.rect(self.screen, (0, 255, 0), pause_button)
