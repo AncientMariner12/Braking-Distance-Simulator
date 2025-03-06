@@ -367,14 +367,14 @@ class simulation:
         if self.islock == False: #if the wheels have not locked
             denominator = 2 * self.Gravity * (totalcoeficent  + self.Grade)
             if denominator <= 0: #if the denominator is 0 the vehicle will not stop
-                self.stop == False
+                self.stop = False
             numerator = self.Velocity ** 2
             self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
             denominator = (totalcoeficent + self.Grade) * self.Mass * self.Gravity
             if denominator <= 0: #if the denominator is 0 the vehicle will not stop
-                self.stop == False
+                self.stop = False
             self.brakeingdistance = numerator / denominator
 
         #applys the multiplyer if it is enabled 
@@ -638,7 +638,7 @@ class resultsscreen():
                                     # check if brakes have failed due to tempature
                     if currenttemp > self.brakemeltingpoint:
                         self.screen.blit(font.render('Warning: Brakes have failed due to high temperature!', True, (255, 0, 0)), (10, self.screenheight - 250)) 
-                        wontstop = [True, "Brakes failed due to tempature"]
+                        self.stop = False
 
 
                 else:
