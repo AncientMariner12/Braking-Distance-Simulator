@@ -3,6 +3,7 @@ import pygame
 import tkinter
 import customtkinter
 import math
+import time
 import threading  
 
 
@@ -237,9 +238,9 @@ class inputscreen:
             simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock, brakemelting point  
             print("Completed simulation")
             if self.Runtemp == True:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue(), simulatedvalues[8], simulatedvalues[9])
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue(), simulatedvalues[8], simulatedvalues[9], simulatedvalues[10])
             else:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None, simulatedvalues[9])
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None, simulatedvalues[9], simulatedvalues[10])
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
             resulsscreenthread = threading.Thread(target=outputscreen.results)
@@ -460,13 +461,13 @@ class simulation:
     
     def returnvalues(self): #returns the results of the simulation
         if self.Runtemp == True:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock, self.Brakemeltingpoint, self.stop)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock, self.Brakemeltingpoint, self.stop, self.Runtemp)
         else:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None, None, self.stop)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None, None, self.stop, self.Runtemp)
 
         
 class resultsscreen():
-    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp, brakemeltingpoint,stop):
+    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp, brakemeltingpoint ,stop, runtemp):
         # define varables 
         self.brakeingdistance = brakeingdistance
         self.stoppingdistance = stoppingdistance
@@ -474,9 +475,15 @@ class resultsscreen():
         self.stoppingtime = stoppingtime
         self.islock = islock
         self.initalvelocity = initalvelocity
-        self.maxtemp = float(maxtemp)  
-        self.ambianttemp = float(ambianttemp)
-        self.brakemeltingpoint = float(brakemeltingpoint)
+        self.runtemp = runtemp
+        if self.runtemp == True:
+            self.maxtemp = float(maxtemp)  
+            self.ambianttemp = float(ambianttemp)
+            self.brakemeltingpoint = float(brakemeltingpoint)
+        else:
+            self.maxtemp = None
+            self.ambianttemp = None
+            self.brakemeltingpoint = None
         self.stop = stop
 
 
@@ -537,6 +544,7 @@ class resultsscreen():
         restart_button = pygame.Rect(1570, self.screenheight - button_height - 100, button_width, button_height)
 
         running = True
+        wheelspeed = None  # Initialize wheelspeed to avoid reference before assignment
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -655,11 +663,13 @@ class resultsscreen():
                     print("Car has stopped")
                     return()
                 
-            elif not self.stop:
+            if not self.stop: #handles if the car wont stop 
                 self.screen.fill((255, 255, 255))  # Clear the screen
                 stoppingwarning = font.render("Warning: Car will not stop. Simulation paused, please input different values.", True, (255, 0, 0))
                 self.screen.blit(stoppingwarning, (10, self.screenheight - 250))
                 self.paused = True
+                pygame.display.update()
+                return()
 
             # Draw buttons
             pygame.draw.rect(self.screen, (0, 255, 0), pause_button)
@@ -672,11 +682,14 @@ class resultsscreen():
             self.screen.blit(restart_text, restart_text_rect)
 
             # Draw text
-            self.screen.blit(wheelspeed, (10, self.screenheight - 100))  # wheels speed meter
+            if wheelspeed:
+                self.screen.blit(wheelspeed, (10, self.screenheight - 100))  # wheels speed meter
             self.screen.blit(speedtext, (10, self.screenheight - 70))  # ground speed meter
             self.screen.blit(distancetext, (10, self.screenheight - 130))  # distance traveled text
             self.screen.blit(timertext, (10, self.screenheight - 160))  # timer text
-            self.screen.blit(temptext, (10, self.screenheight - 190))  # temperature text
+            if self.maxtemp is not None:
+                self.screen.blit(temptext, (10, self.screenheight - 190))  # temperature text
+
 
             frame += 1
             # Update the display
