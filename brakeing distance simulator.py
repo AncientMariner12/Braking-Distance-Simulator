@@ -243,8 +243,8 @@ class inputscreen:
                 outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None, simulatedvalues[9], simulatedvalues[10])
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
-            resulsscreenthread = threading.Thread(target=outputscreen.results)
-            resulsscreenthread.start()
+            outputscreen.results()
+            
 
 class widgets:
     def __init__(self,screen, label):#initializes the widgets class
@@ -535,7 +535,7 @@ class resultsscreen():
 
         # calculate tempature change per frame 
         if self.maxtemp is not None:
-            tempchangeperframe = ((self.maxtemp - self.ambianttemp) / self.brakeingtime) / 60
+            tempchangeperframe = ((self.maxtemp - self.ambianttemp) / self.brakeingtime) / 60 # type: ignore
 
         # Initialize buttons
         button_width = 100
@@ -644,7 +644,7 @@ class resultsscreen():
                     temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                     self.screen.blit(temptext, (10, self.screenheight - 190))
                                     # check if brakes have failed due to tempature
-                    if currenttemp > self.brakemeltingpoint:
+                    if currenttemp > self.brakemeltingpoint: # type: ignore
                         self.screen.blit(font.render('Warning: Brakes have failed due to high temperature!', True, (255, 0, 0)), (10, self.screenheight - 250)) 
                         self.stop = False
 
@@ -659,9 +659,15 @@ class resultsscreen():
 
                 #stops the simulation if the car has stopped
                 if distancetraveled >= self.stoppingdistance:
-                    self.paused = True
-                    print("Car has stopped")
-                    return()
+                    # bufferframe is used to stop the simulation after the car has stopped for 2 seconds,
+                    #  the 2 seconds is reqired to make sure the animation has finished as there is a delay of all of the  objects being added to the screen on lower end devices.
+                    bufferframe = bufferframe +1
+                    if bufferframe >= 120:
+                        self.paused = True
+                        print("Car has stopped")
+                        return()
+                else:
+                    bufferframe = 0
                 
             if not self.stop: #handles if the car wont stop 
                 self.screen.fill((255, 255, 255))  # Clear the screen
@@ -696,11 +702,23 @@ class resultsscreen():
             pygame.display.update()
             clock.tick(60)
 
-        # Quit Pygame
-        pygame.quit()
     def results(self):
         print("results")
-        pass
+        # Set up the display
+        pygame.draw.rect(self.screen, (255, 255, 255), (0, 0, self.screenwidth, self.screenheight))  # Clear the screen
+        pygame.font.init()
+        font = pygame.font.SysFont('Arial', 30)
+        # Adds the results to arrays 
+        outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime]
+        outputtext = ["Braking Distance", "Stopping Distance", "Braking Time", "Stopping Time"]
+        position = [[10, self.screenheight - 10 ],[10, self.screenheight - 40],[10, self.screenheight - 70],[10, self.screenheight - 100]]
+        #itterates through the array and dispalys the results
+        for i in range(len(outputs)):
+            text = font.render(f'{outputtext[i]}: {outputs[i]:.2f} m', True, (0, 0, 0))
+            self.screen.blit(text, (position[i][0], position[i][1]))
+        
+        pygame.display.update()
+        
 
 def main():
 
