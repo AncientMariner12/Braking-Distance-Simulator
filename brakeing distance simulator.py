@@ -357,7 +357,7 @@ class simulation:
 
 
     def lock(self): #checks if the wheels of the vehicle has locked
-        if ((self.Fricitioncotyres + self.Grade)* self.Gravity * self.Mass) < (2 * (self.fricitioncobrakes + self.frictioncoregen) *self.Clampforce):
+        if ((self.Fricitioncotyres + self.Grade)* self.Gravity * self.Mass) > (2 * (self.fricitioncobrakes + self.frictioncoregen) *self.Clampforce):
             self.islock = False 
         else:
             self.islock = True
