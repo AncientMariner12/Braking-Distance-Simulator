@@ -235,12 +235,12 @@ class inputscreen:
             print("Before stopingtime")
             runsimulation.stopingtime()
             print("After stopingtime")
-            simulatedvalues = runsimulation.returnvalues() #brakeing distance, stopping distance, brakeing time, stopping time, islock, brakemelting point  
-            print("Completed simulation")
+            simulatedvalues = runsimulation.returnvalues()#brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, islock, maxtemp, tempchange,  heatgen, Brakemeltingpoint, stop, runtemp, initialvelocity, ambienttemp
+            print(simulatedvalues)
             if self.Runtemp == True:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), simulatedvalues[7], self.Ambienttempwidgets.returnvalue(), simulatedvalues[8], simulatedvalues[9], simulatedvalues[10])
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], simulatedvalues[5], simulatedvalues[6], simulatedvalues[7], simulatedvalues[8], simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue(), self.Ambienttempwidgets.returnvalue())
             else:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], self.Velocitywidgets.returnvalue(), None, None, None, simulatedvalues[9], simulatedvalues[10])
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], None, None, None ,None, simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue, None)
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
             outputscreen.results()
@@ -357,7 +357,7 @@ class simulation:
 
 
     def lock(self): #checks if the wheels of the vehicle has locked
-        if ((self.Fricitioncotyres + self.Grade)* self.Gravity * self.Mass) < (2 * (self.fricitioncobrakes + self.frictioncoregen) *self.Clampforce):
+        if ((self.Fricitioncotyres + self.Grade)* self.Gravity * self.Mass) >= (2 * (self.fricitioncobrakes + self.frictioncoregen) *self.Clampforce):
             self.islock = False 
         else:
             self.islock = True
@@ -366,12 +366,14 @@ class simulation:
         totalcoeficent = self.fricitioncobrakes + self.frictioncoregen
 
         if self.islock == False: #if the wheels have not locked
+            print("not locked")
             denominator = 2 * self.Gravity * (totalcoeficent  + self.Grade)
             if denominator <= 0: #if the denominator is 0 the vehicle will not stop
                 self.stop = False
             numerator = self.Velocity ** 2
             self.brakeingdistance = numerator / denominator
         else: #if the wheels have locked
+            print("locked")
             numerator = 0.5 * self.Mass * (self.Velocity ** 2)
             denominator = (totalcoeficent + self.Grade) * self.Mass * self.Gravity
             if denominator <= 0: #if the denominator is 0 the vehicle will not stop
@@ -461,25 +463,27 @@ class simulation:
     
     def returnvalues(self): #returns the results of the simulation
         if self.Runtemp == True:
-            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.maxtemp, self.tempchange,  self.heatgen, self.islock, self.Brakemeltingpoint, self.stop, self.Runtemp)
+            return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.maxtemp, self.tempchange,  self.heatgen, self.Brakemeltingpoint, self.stop, self.Runtemp)
         else:
             return(self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, None, None, None, None, self.stop, self.Runtemp)
 
         
 class resultsscreen():
-    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, maxtemp, initalvelocity, islock, ambianttemp, brakemeltingpoint ,stop, runtemp):
+    def __init__(self, brakeingdistance, stoppingdistance, brakeingtime, stoppingtime, islock, maxtemp, tempchange,  heatgen, Brakemeltingpoint, stop, runtemp, initialvelocity, ambienttemp):
         # define varables 
         self.brakeingdistance = brakeingdistance
         self.stoppingdistance = stoppingdistance
         self.brakeingtime = brakeingtime
         self.stoppingtime = stoppingtime
         self.islock = islock
-        self.initalvelocity = initalvelocity
+        self.initalvelocity = initialvelocity
         self.runtemp = runtemp
         if self.runtemp == True:
             self.maxtemp = float(maxtemp)  
-            self.ambianttemp = float(ambianttemp)
-            self.brakemeltingpoint = float(brakemeltingpoint)
+            self.ambianttemp = float(ambienttemp)
+            self.brakemeltingpoint = float(Brakemeltingpoint)
+            self.tempchange = float(tempchange)
+            self.heatgen = float(heatgen)
         else:
             self.maxtemp = None
             self.ambianttemp = None
