@@ -240,9 +240,10 @@ class inputscreen:
             if self.Runtemp == True:
                 outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], simulatedvalues[5], simulatedvalues[6], simulatedvalues[7], simulatedvalues[8], simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue(), self.Ambienttempwidgets.returnvalue())
             else:
-                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], None, None, None ,None, simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue, None)
+                outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], None, None, None ,None, simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue(), None)
             simulation_thread = threading.Thread(target=outputscreen.animation)
             simulation_thread.start()
+            simulation_thread.join()  # Wait for the animation thread to finish
             outputscreen.results()
             
 
@@ -549,6 +550,9 @@ class resultsscreen():
 
         running = True
         wheelspeed = None  # Initialize wheelspeed to avoid reference before assignment
+        bufferframe = 0  # Initialize bufferframe to avoid reference before assignment
+
+        #car attributes  
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -585,9 +589,8 @@ class resultsscreen():
                 self.screen.fill((255, 255, 255))
                 self.screen.blit(background, (bg_x, -200))
                 self.screen.blit(background, (bg_x + background.get_width(), -200))
-                
 
-                # Draw car
+                # Draw car...
                 car_x = 500
                 car_y = self.screenheight - car.get_height() - 450  # Place the car on the road
                 self.screen.blit(car, (car_x, car_y))
@@ -647,18 +650,18 @@ class resultsscreen():
                         currenttemp = self.maxtemp
                     temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                     self.screen.blit(temptext, (10, self.screenheight - 190))
-                                    # check if brakes have failed due to tempature
+                    # check if brakes have failed due to tempature
                     if currenttemp > self.brakemeltingpoint: # type: ignore
                         self.screen.blit(font.render('Warning: Brakes have failed due to high temperature!', True, (255, 0, 0)), (10, self.screenheight - 250)) 
                         self.stop = False
-
-
                 else:
-                    try:
-                        temptext = font.render(f'Temperature: {self.ambianttemp:.2f} °C', True, (0, 0, 0))
+                    if currentvelocity <= 0 and self.maxtemp is not None: #checks if the car has stooped
+                        currenttemp = self.maxtemp #if it has sets the current tempature to the maximum tempature reached 
+                    else:
+                        currenttemp = self.ambianttemp
+                    if self.maxtemp is not None: #renders the tempaturre meter to the screen if the tempature calculations are done.
+                        temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                         self.screen.blit(temptext, (10, self.screenheight - 190))
-                    except:
-                        pass
             
 
                 #stops the simulation if the car has stopped
@@ -680,7 +683,7 @@ class resultsscreen():
                 self.paused = True
                 pygame.display.update()
                 return()
-
+            
             # Draw buttons
             pygame.draw.rect(self.screen, (0, 255, 0), pause_button)
             pygame.draw.rect(self.screen, (255, 0, 0), restart_button)
@@ -699,7 +702,6 @@ class resultsscreen():
             self.screen.blit(timertext, (10, self.screenheight - 160))  # timer text
             if self.maxtemp is not None:
                 self.screen.blit(temptext, (10, self.screenheight - 190))  # temperature text
-
 
             frame += 1
             # Update the display
