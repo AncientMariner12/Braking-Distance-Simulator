@@ -552,6 +552,15 @@ class resultsscreen():
         wheelspeed = None  # Initialize wheelspeed to avoid reference before assignment
         bufferframe = 0  # Initialize bufferframe to avoid reference before assignment
 
+        #Car constants
+        car_x = 500
+        car_y = self.screenheight - car.get_height() - 450  # Place the car on the road
+        leftwheel_x = 580
+        rightwheel_x = 1033
+        leftwheel_y = self.screenheight - car.get_height() - 146
+        rightwheel_y = self.screenheight - car.get_height() - 146 #
+        circumference = rightwheel.get_height() * math.pi
+
         #car attributes  
         while running:
             for event in pygame.event.get():
@@ -590,17 +599,11 @@ class resultsscreen():
                 self.screen.blit(background, (bg_x, -200))
                 self.screen.blit(background, (bg_x + background.get_width(), -200))
 
-                # Draw car...
-                car_x = 500
-                car_y = self.screenheight - car.get_height() - 450  # Place the car on the road
+                # Draw car
+
                 self.screen.blit(car, (car_x, car_y))
-                leftwheel_x = 580
-                rightwheel_x = 1033
-                leftwheel_y = self.screenheight - car.get_height() - 146
-                rightwheel_y = self.screenheight - car.get_height() - 146 
                 if self.islock == False:
                     #calculate the rotation of the wheels
-                    circumference = rightwheel.get_height() * math.pi
                     rotationangle = 360 *  (currentvelocity / circumference) 
 
                     # Make the wheels rotate
@@ -615,7 +618,6 @@ class resultsscreen():
 
                     self.screen.blit(leftwheelrotated, leftwheelrect.topleft)
                     self.screen.blit(rightwheelrotated, rightwheelrect.topleft)
-                    print(currentvelocity, rotationangle)
                 else:
                     wheelvelcoity = 0 
                     wheelspeed = font.render(f'Speedometer: {wheelvelcoity:.2f} m/s', True, (0, 0, 0))
@@ -715,16 +717,15 @@ class resultsscreen():
         pygame.font.init()
         font = pygame.font.SysFont('Arial', 30)
         # Adds the results to arrays 
-        outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime]
-        outputtext = ["Braking Distance", "Stopping Distance", "Braking Time", "Stopping Time"]
-        position = [[10, self.screenheight - 10 ],[10, self.screenheight - 40],[10, self.screenheight - 70],[10, self.screenheight - 100]]
-        #itterates through the array and dispalys the results
+        outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.stop, self.runtemp, self.initalvelocity, self.ambianttemp]
+        outputtext = ["Braking Distance", "Stopping Distance", "Braking Time", "Stopping Time", "Wheels Locked", "Max Temperature", "Temperature Change", "Heat Generated", "Brake Melting Point", "Stop", "Run Temperature", "Initial Velocity", "Ambient Temperature"]
+        position = [[10, self.screenheight - 30 * (i + 1)] for i in range(len(outputs))]
+        # itterates through the array and displays the results
         for i in range(len(outputs)):
-            text = font.render(f'{outputtext[i]}: {outputs[i]:.2f} m', True, (0, 0, 0))
+            text = font.render(f'{outputtext[i]}: {outputs[i]}', True, (0, 0, 0))
             self.screen.blit(text, (position[i][0], position[i][1]))
         
         pygame.display.update()
-        
 
 def main():
 
