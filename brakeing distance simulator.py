@@ -564,7 +564,7 @@ class resultsscreen():
         #car attributes  
         while running:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if pause_button.collidepoint(event.pos):
@@ -708,7 +708,9 @@ class resultsscreen():
             frame += 1
             # Update the display
             pygame.display.update()
+            print(frame, "fwame")
             clock.tick(60)
+
 
     def results(self):
         print("results")
