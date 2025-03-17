@@ -6,6 +6,8 @@ import math
 import time
 import threading  
 
+# Initialize the font module
+pygame.font.init()
 
 class inputscreen:
     def __init__(self): #initializes the customtkinter screen
@@ -323,6 +325,57 @@ class widgets:
     def getlabel(self):
         return self.label
 
+def displaytext(text, position, color, screen):
+    font = pygame.font.SysFont('Arial', 30)
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=position)
+    screen.blit(text_surface, text_rect)
+
+class pygamebutton:
+    def __init__(self, screen, colour, hovercolour, text, position, width, height, action=None):
+        self.screen = screen
+        self.colour = colour
+        self.hovercolour = hovercolour
+        self.text = text
+        self.position = position
+        self.width = width
+        self.height = height
+        self.action = action
+
+        # Calculate the centre of the button
+        self.button_center = ((self.position[0] + (self.width//2)), self.position[1] + (self.height//2))
+
+        pygame.draw.rect(screen, self.colour, (self.position[0], self.position[1], self.width, self.height), 0, 15)
+        displaytext(self.text, self.button_center, "black", screen)
+
+        self.lastupdate = False
+        self.currentupdate = False
+
+    def draw_button(self, screen):
+        # Get the position of the mouse and see if the user is clicking
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        # Check if user is hovering over button
+        if self.position[0] < mouse[0] < self.position[0] + self.width and self.position[1] < mouse[1] < self.position[1] + self.height:
+            self.currentupdate = True
+            button_color = self.hovercolour
+            if click[0]:
+                # Preform the button's action if the user clicks
+                self.action()
+        else:
+            button_color = self.colour
+            self.currentupdate = False
+
+        if self.currentupdate != self.lastupdate:
+            # Draw a rectangle for the button
+            pygame.draw.rect(screen, button_color, (self.position[0], self.position[1], self.width, self.height), 0, 15)
+            
+            # Display text on button
+            displaytext(self.text, self.button_center,  "black", screen)
+
+        self.lastupdate = self.currentupdate
+
 class simulation:
     def __init__(self,  Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Mass, Grade, Clampforce, usemultiplier, multiplier):
         #initaliseation method
@@ -501,8 +554,13 @@ class resultsscreen():
         self.restart = False
         pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONDOWN])  # Allow specific events
 
+        # Initialize buttons
+        self.pause_button = pygamebutton(self.screen, (0, 255, 0), (0, 200, 0), 'Pause', (self.screenwidth - 120, self.screenheight - 70), 100, 50, self.toggle_pause)
+        self.restart_button = pygamebutton(self.screen, (255, 0, 0), (200, 0, 0), 'Restart', (self.screenwidth - 240, self.screenheight - 70), 100, 50, self.restart_animation)
+
     def toggle_pause(self):
         self.paused = not self.paused
+        self.pause_button.text = 'Play' if self.paused else 'Pause'
 
     def restart_animation(self):
         self.restart = True
@@ -543,12 +601,6 @@ class resultsscreen():
         if self.maxtemp is not None:
             tempchangeperframe = ((self.maxtemp - self.ambianttemp) / self.brakeingtime) / 60 # type: ignore
 
-        # Initialize buttons
-        button_width = 100
-        button_height = 50  
-        pause_button = pygame.Rect(self.screenwidth - button_width - 20, self.screenheight - button_height - 20, button_width, button_height)
-        restart_button = pygame.Rect(self.screenwidth - 2 * button_width - 40, self.screenheight - button_height - 20, button_width, button_height)
-
         running = True
         wheelspeed = None  # Initialize wheelspeed to avoid reference before assignment
         bufferframe = 0  # Initialize bufferframe to avoid reference before assignment
@@ -561,19 +613,11 @@ class resultsscreen():
         leftwheel_y = self.screenheight - car.get_height() - 146
         rightwheel_y = self.screenheight - car.get_height() - 146 #
         circumference = rightwheel.get_height() * math.pi
-
-        #car attributes  
+  
         while running:
             for event in pygame.event.get():
-                print(event)
                 if event.type == pygame.QUIT:
                     running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    if pause_button.collidepoint(mouse_pos):
-                        self.toggle_pause()
-                    elif restart_button.collidepoint(mouse_pos):
-                        self.restart_animation()
 
             if self.restart:
                 frame = 0
@@ -690,14 +734,8 @@ class resultsscreen():
                 return()
             
             # Draw buttons
-            pygame.draw.rect(self.screen, (0, 255, 0), pause_button)
-            pygame.draw.rect(self.screen, (255, 0, 0), restart_button)
-            pause_text = font.render('Pause' if not self.paused else 'Play', True, (0, 0, 0))
-            restart_text = font.render('Restart', True, (0, 0, 0))
-            pause_text_rect = pause_text.get_rect(center=pause_button.center)
-            restart_text_rect = restart_text.get_rect(center=restart_button.center)
-            self.screen.blit(pause_text, pause_text_rect)
-            self.screen.blit(restart_text, restart_text_rect)
+            self.pause_button.draw_button(self.screen)
+            self.restart_button.draw_button(self.screen)
 
             # Draw text
             if wheelspeed:
@@ -711,7 +749,6 @@ class resultsscreen():
             frame += 1
             # Update the display
             pygame.display.update()
-            pygame.event.clear() #clears the event queue
             clock.tick(60)
 
 
@@ -733,13 +770,10 @@ class resultsscreen():
         pygame.display.update()
 
 def main():
-
-
     dataentryscreen = inputscreen()
-    dataentryscreen.display() 
-
-
+    dataentryscreen.display()
 
 main()
+
 
 
