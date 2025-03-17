@@ -499,6 +499,7 @@ class resultsscreen():
         pygame.display.set_caption("Braking Distance Simulator")
         self.paused = False
         self.restart = False
+        pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONDOWN])  # Allow specific events
 
     def toggle_pause(self):
         self.paused = not self.paused
@@ -544,9 +545,9 @@ class resultsscreen():
 
         # Initialize buttons
         button_width = 100
-        button_height = 100
-        pause_button = pygame.Rect(1680, self.screenheight - button_height - 100, button_width, button_height)
-        restart_button = pygame.Rect(1570, self.screenheight - button_height - 100, button_width, button_height)
+        button_height = 50  
+        pause_button = pygame.Rect(self.screenwidth - button_width - 20, self.screenheight - button_height - 20, button_width, button_height)
+        restart_button = pygame.Rect(self.screenwidth - 2 * button_width - 40, self.screenheight - button_height - 20, button_width, button_height)
 
         running = True
         wheelspeed = None  # Initialize wheelspeed to avoid reference before assignment
@@ -564,12 +565,14 @@ class resultsscreen():
         #car attributes  
         while running:
             for event in pygame.event.get():
-                 if event.type == pygame.QUIT:
+                print(event)
+                if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if pause_button.collidepoint(event.pos):
+                    mouse_pos = pygame.mouse.get_pos()
+                    if pause_button.collidepoint(mouse_pos):
                         self.toggle_pause()
-                    elif restart_button.collidepoint(event.pos):
+                    elif restart_button.collidepoint(mouse_pos):
                         self.restart_animation()
 
             if self.restart:
@@ -708,7 +711,7 @@ class resultsscreen():
             frame += 1
             # Update the display
             pygame.display.update()
-            print(frame, "fwame")
+            pygame.event.clear() #clears the event queue
             clock.tick(60)
 
 
