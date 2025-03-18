@@ -8,6 +8,7 @@ import threading
 import pygame_widgets
 from pygame_widgets.button import Button  
 import csv
+import tkinter.filedialog
 
 # Initialize the font module
 pygame.font.init()
@@ -755,11 +756,13 @@ class resultsscreen():
         results_window.mainloop()
 
     def save_to_csv(self):
-        with open('simulation_results.csv', mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Parameter", "Value"])
-            for i in range(len(self.outputs)):
-                writer.writerow([self.outputtext[i], self.outputs[i]])
+        file_path = tkinter.filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+        if file_path:
+            with open(file_path, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Parameter", "Value"])
+                for i in range(len(self.outputs)):
+                    writer.writerow([self.outputtext[i], self.outputs[i]])
 
 def main():
     dataentryscreen = inputscreen()
