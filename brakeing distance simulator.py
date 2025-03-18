@@ -7,6 +7,7 @@ import time
 import threading
 import pygame_widgets
 from pygame_widgets.button import Button  
+import csv
 
 # Initialize the font module
 pygame.font.init()
@@ -727,8 +728,8 @@ class resultsscreen():
         results_window.geometry(geometry)
 
         # Adds the results to arrays 
-        outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.initalvelocity, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.ambianttemp]
-        outputtext = ["Braking Distance (m)", "Stopping Distance (m)", "Braking Time (s)", "Stopping Time (s)", "Wheels Locked",   "Initial Velocity (v)",  "Max Temperature (c)", "Temperature Change (c)", "Heat Generated (c)", "Brake Melting Point (c)", "Ambient Temperature (c)"]
+        self.outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.initalvelocity, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.ambianttemp]
+        self.outputtext = ["Braking Distance (m)", "Stopping Distance (m)", "Braking Time (s)", "Stopping Time (s)", "Wheels Locked",   "Initial Velocity (v)",  "Max Temperature (c)", "Temperature Change (c)", "Heat Generated (c)", "Brake Melting Point (c)", "Ambient Temperature (c)"]
 
         # Create a frame to hold the results
         frame = customtkinter.CTkFrame(results_window)
@@ -736,18 +737,29 @@ class resultsscreen():
 
         # Iterate through the array and display the results
         if self.runtemp == True:
-            length = len(outputs) 
+            length = len(self.outputs) 
         else:
-            length = len(outputs) - 5
+            length = len(self.outputs) - 5
         for i in range(length):
-            label = customtkinter.CTkLabel(frame, text=f'{outputtext[i]}: {outputs[i]}')
+            label = customtkinter.CTkLabel(frame, text=f'{self.outputtext[i]}: {self.outputs[i]}')
             label.pack(anchor="w", pady=5)
+
+        # Add a save button
+        save_button = customtkinter.CTkButton(results_window, text="Save to CSV", command=self.save_to_csv)
+        save_button.pack(pady=10)
 
         # Add a close button
         close_button = customtkinter.CTkButton(results_window, text="Close", command=results_window.destroy)
         close_button.pack(pady=10)
 
         results_window.mainloop()
+
+    def save_to_csv(self):
+        with open('simulation_results.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Parameter", "Value"])
+            for i in range(len(self.outputs)):
+                writer.writerow([self.outputtext[i], self.outputs[i]])
 
 def main():
     dataentryscreen = inputscreen()
