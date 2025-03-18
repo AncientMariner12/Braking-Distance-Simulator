@@ -4,7 +4,9 @@ import tkinter
 import customtkinter
 import math
 import time
-import threading  
+import threading
+import pygame_widgets
+from pygame_widgets.button import Button  
 
 # Initialize the font module
 pygame.font.init()
@@ -331,47 +333,6 @@ def displaytext(text, position, color, screen):
     text_rect = text_surface.get_rect(center=position)
     screen.blit(text_surface, text_rect)
 
-class pygamebutton:
-    def __init__(self, screen, colour, hovercolour, text, position, width, height, action):
-        self.screen = screen
-        self.colour = colour
-        self.hovercolour = hovercolour
-        self.text = text
-        self.position = position
-        self.width = width
-        self.height = height
-        self.action = action
-
-        # Calculate the centre of the button
-        self.button_center = ((self.position[0] + (self.width//2)), self.position[1] + (self.height//2))
-
-        self.lastupdate = False
-        self.currentupdate = False
-
-    def draw_button(self):
-        # Get the position of the mouse and see if the user is clicking
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        # Check if user is hovering over button
-        if self.position[0] < mouse[0] < self.position[0] + self.width and self.position[1] < mouse[1] < self.position[1] + self.height:
-            self.currentupdate = True
-            button_color = self.hovercolour
-            if click[0]:
-                # Perform the button's action if the user clicks
-                self.action()
-        else:
-            button_color = self.colour
-            self.currentupdate = False
-
-        if self.currentupdate != self.lastupdate:
-            # Draw a rectangle for the button
-            pygame.draw.rect(self.screen, button_color, (self.position[0], self.position[1], self.width, self.height), 0, 15)
-            
-            # Display text on button
-            displaytext(self.text, self.button_center, "black", self.screen)
-
-        self.lastupdate = self.currentupdate
 
 class simulation:
     def __init__(self,  Runtemp, Ambienttemp, Diskdencity, Brakemeltingpoint, Diskvolume, Reacttime, Gravity, Velocity, fricitioncobrakes, frictioncoregen, Fricitioncotyres, Mass, Grade, Clampforce, usemultiplier, multiplier):
@@ -553,19 +514,15 @@ class resultsscreen():
 
     def togglepause(self):
         self.paused = not self.paused
-        self.pause_button.text = 'Play' if self.paused else 'Pause'
+        self.pause_button.setText('Play' if self.paused else 'Pause')
 
     def restartanimation(self):
         self.restart = True
 
-    def button_thread(self):
-        while True:
-            self.pause_button.draw_button()
-            self.restart_button.draw_button()
-            time.sleep(0.1)  # Adjust the sleep time as needed
+
 
     def animation(self):
- 
+        
         frame = 0
         # Load images
         car = pygame.image.load("car.png")
@@ -613,13 +570,13 @@ class resultsscreen():
         rightwheel_y = self.screenheight - car.get_height() - 146 #
         circumference = rightwheel.get_height() * math.pi
 
-        # Start the button handling in a separate thread
-        button_thread = threading.Thread(target=self.button_thread)
-        button_thread.daemon = True  # Ensure the thread exits when the main program does
-        button_thread.start()
+        # Create buttons using pygame_widgets
+        self.pause_button = Button(self.screen, self.screenwidth - 120, self.screenheight - 70, 100, 50, text='Pause', onClick=self.togglepause)
+        self.restart_button = Button(self.screen, self.screenwidth - 240, self.screenheight - 70, 100, 50, text='Restart', onClick=self.restartanimation)
 
         while running:
-            for event in pygame.event.get():
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     running = False
 
@@ -716,11 +673,7 @@ class resultsscreen():
                         temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                         self.screen.blit(temptext, (10, self.screenheight - 190))
                  
-                # Draw buttons
-                self.pause_button = pygamebutton(self.screen, (0, 255, 0), (0, 200, 0), 'Pause', (self.screenwidth - 120, self.screenheight - 70), 100, 50, self.togglepause)
-                self.restart_button = pygamebutton(self.screen, (255, 0, 0), (200, 0, 0), 'Restart', (self.screenwidth - 240, self.screenheight - 70), 100, 50, self.restartanimation)
-                self.pause_button.draw_button()
-                self.restart_button.draw_button()
+                 
                 #stops the simulation if the car has stopped
                 if distancetraveled >= self.stoppingdistance:
                     # bufferframe is used to stop the simulation after the car has stopped for 2 seconds,
@@ -738,12 +691,12 @@ class resultsscreen():
                 stoppingwarning = font.render("Warning: Car will not stop. Simulation paused, please input different values.", True, (255, 0, 0))
                 self.screen.blit(stoppingwarning, (10, self.screenheight - 250))
                 self.paused = True
+                pygame_widgets.update(events)
                 pygame.display.update()
                 return()
             
-            # Draw buttons
-            self.pause_button.draw_button()
-            self.restart_button.draw_button()
+            # Update buttons
+            pygame_widgets.update(events)
 
             # Draw text
             if wheelspeed:
@@ -762,20 +715,39 @@ class resultsscreen():
 
     def results(self):
         print("results")
-        # Set up the display
-        pygame.draw.rect(self.screen, (255, 255, 255), (0, 0, self.screenwidth, self.screenheight))  # Clear the screen
-        pygame.font.init()
-        font = pygame.font.SysFont('Arial', 30)
+        # Create the results window using customtkinter
+        results_window = customtkinter.CTk()
+        results_window.eval('tk::PlaceWindow . center')
+        results_window.title("Simulation Results")
+
+        # Set the size of the window
+        width = 800
+        height = 600
+        geometry = str(width) + "x" + str(height)
+        results_window.geometry(geometry)
+
         # Adds the results to arrays 
-        outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.stop, self.runtemp, self.initalvelocity, self.ambianttemp]
-        outputtext = ["Braking Distance", "Stopping Distance", "Braking Time", "Stopping Time", "Wheels Locked", "Max Temperature", "Temperature Change", "Heat Generated", "Brake Melting Point", "Stop", "Run Temperature", "Initial Velocity", "Ambient Temperature"]
-        position = [[10, self.screenheight - 30 * (i + 1)] for i in range(len(outputs))]
-        # itterates through the array and displays the results
-        for i in range(len(outputs)):
-            text = font.render(f'{outputtext[i]}: {outputs[i]}', True, (0, 0, 0))
-            self.screen.blit(text, (position[i][0], position[i][1]))
-        
-        pygame.display.update()
+        outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.initalvelocity, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.ambianttemp]
+        outputtext = ["Braking Distance (m)", "Stopping Distance (m)", "Braking Time (s)", "Stopping Time (s)", "Wheels Locked",   "Initial Velocity (v)",  "Max Temperature (c)", "Temperature Change (c)", "Heat Generated (c)", "Brake Melting Point (c)", "Ambient Temperature (c)"]
+
+        # Create a frame to hold the results
+        frame = customtkinter.CTkFrame(results_window)
+        frame.pack(pady=20, padx=20, fill="both", expand=True)
+
+        # Iterate through the array and display the results
+        if self.runtemp == True:
+            length = len(outputs) 
+        else:
+            length = len(outputs) - 5
+        for i in range(length):
+            label = customtkinter.CTkLabel(frame, text=f'{outputtext[i]}: {outputs[i]}')
+            label.pack(anchor="w", pady=5)
+
+        # Add a close button
+        close_button = customtkinter.CTkButton(results_window, text="Close", command=results_window.destroy)
+        close_button.pack(pady=10)
+
+        results_window.mainloop()
 
 def main():
     dataentryscreen = inputscreen()
