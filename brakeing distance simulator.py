@@ -332,7 +332,7 @@ def displaytext(text, position, color, screen):
     screen.blit(text_surface, text_rect)
 
 class pygamebutton:
-    def __init__(self, screen, colour, hovercolour, text, position, width, height, action=None):
+    def __init__(self, screen, colour, hovercolour, text, position, width, height, action):
         self.screen = screen
         self.colour = colour
         self.hovercolour = hovercolour
@@ -345,13 +345,10 @@ class pygamebutton:
         # Calculate the centre of the button
         self.button_center = ((self.position[0] + (self.width//2)), self.position[1] + (self.height//2))
 
-        pygame.draw.rect(screen, self.colour, (self.position[0], self.position[1], self.width, self.height), 0, 15)
-        displaytext(self.text, self.button_center, "black", screen)
-
         self.lastupdate = False
         self.currentupdate = False
 
-    def draw_button(self, screen):
+    def draw_button(self):
         # Get the position of the mouse and see if the user is clicking
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -361,7 +358,7 @@ class pygamebutton:
             self.currentupdate = True
             button_color = self.hovercolour
             if click[0]:
-                # Preform the button's action if the user clicks
+                # Perform the button's action if the user clicks
                 self.action()
         else:
             button_color = self.colour
@@ -369,10 +366,10 @@ class pygamebutton:
 
         if self.currentupdate != self.lastupdate:
             # Draw a rectangle for the button
-            pygame.draw.rect(screen, button_color, (self.position[0], self.position[1], self.width, self.height), 0, 15)
+            pygame.draw.rect(self.screen, button_color, (self.position[0], self.position[1], self.width, self.height), 0, 15)
             
             # Display text on button
-            displaytext(self.text, self.button_center,  "black", screen)
+            displaytext(self.text, self.button_center, "black", self.screen)
 
         self.lastupdate = self.currentupdate
 
@@ -552,18 +549,20 @@ class resultsscreen():
         pygame.display.set_caption("Braking Distance Simulator")
         self.paused = False
         self.restart = False
-        pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONDOWN])  # Allow specific events
 
-        # Initialize buttons
-        self.pause_button = pygamebutton(self.screen, (0, 255, 0), (0, 200, 0), 'Pause', (self.screenwidth - 120, self.screenheight - 70), 100, 50, self.toggle_pause)
-        self.restart_button = pygamebutton(self.screen, (255, 0, 0), (200, 0, 0), 'Restart', (self.screenwidth - 240, self.screenheight - 70), 100, 50, self.restart_animation)
 
-    def toggle_pause(self):
+    def togglepause(self):
         self.paused = not self.paused
         self.pause_button.text = 'Play' if self.paused else 'Pause'
 
-    def restart_animation(self):
+    def restartanimation(self):
         self.restart = True
+
+    def button_thread(self):
+        while True:
+            self.pause_button.draw_button()
+            self.restart_button.draw_button()
+            time.sleep(0.1)  # Adjust the sleep time as needed
 
     def animation(self):
  
@@ -613,7 +612,12 @@ class resultsscreen():
         leftwheel_y = self.screenheight - car.get_height() - 146
         rightwheel_y = self.screenheight - car.get_height() - 146 #
         circumference = rightwheel.get_height() * math.pi
-  
+
+        # Start the button handling in a separate thread
+        button_thread = threading.Thread(target=self.button_thread)
+        button_thread.daemon = True  # Ensure the thread exits when the main program does
+        button_thread.start()
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -711,8 +715,12 @@ class resultsscreen():
                     if self.maxtemp is not None: #renders the tempaturre meter to the screen if the tempature calculations are done.
                         temptext = font.render(f'Temperature: {currenttemp:.2f} °C', True, (0, 0, 0))
                         self.screen.blit(temptext, (10, self.screenheight - 190))
-            
-
+                 
+                # Draw buttons
+                self.pause_button = pygamebutton(self.screen, (0, 255, 0), (0, 200, 0), 'Pause', (self.screenwidth - 120, self.screenheight - 70), 100, 50, self.togglepause)
+                self.restart_button = pygamebutton(self.screen, (255, 0, 0), (200, 0, 0), 'Restart', (self.screenwidth - 240, self.screenheight - 70), 100, 50, self.restartanimation)
+                self.pause_button.draw_button()
+                self.restart_button.draw_button()
                 #stops the simulation if the car has stopped
                 if distancetraveled >= self.stoppingdistance:
                     # bufferframe is used to stop the simulation after the car has stopped for 2 seconds,
@@ -734,8 +742,8 @@ class resultsscreen():
                 return()
             
             # Draw buttons
-            self.pause_button.draw_button(self.screen)
-            self.restart_button.draw_button(self.screen)
+            self.pause_button.draw_button()
+            self.restart_button.draw_button()
 
             # Draw text
             if wheelspeed:
