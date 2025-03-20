@@ -728,8 +728,18 @@ class resultsscreen():
         geometry = str(width) + "x" + str(height)
         results_window.geometry(geometry)
 
-        # Adds the results to arrays 
-        self.outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, self.islock, self.initalvelocity, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.ambianttemp]
+
+        # Convert the boolean to a string for display (because python automatically displays a boolean as 1 or 0 instead of true and false when outputted to a csv file )
+        if self.islock:
+            islockstr = "Yes"
+        else:
+            islockstr = "No"
+        
+        # Adds the results to an array 
+        if self.runtemp == True:
+            self.outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, islockstr, self.initalvelocity, self.maxtemp, self.tempchange, self.heatgen, self.brakemeltingpoint, self.ambianttemp]
+        else:
+            self.outputs = [self.brakeingdistance, self.stoppingdistance, self.brakeingtime, self.stoppingtime, islockstr, self.initalvelocity]
         self.outputtext = ["Braking Distance (m)", "Stopping Distance (m)", "Braking Time (s)", "Stopping Time (s)", "Wheels Locked",   "Initial Velocity (v)",  "Max Temperature (c)", "Temperature Change (c)", "Heat Generated (c)", "Brake Melting Point (c)", "Ambient Temperature (c)"]
 
         # Create a frame to hold the results
@@ -740,8 +750,12 @@ class resultsscreen():
         if self.runtemp == True:
             length = len(self.outputs) 
         else:
-            length = len(self.outputs) - 5
+            length = len(self.outputs)
         for i in range(length):
+            try:
+                self.outputs[i] = round(self.outputs[i], 3) # Round the output to 3 decimal places to remove the affect of floating point errors 
+            except:
+                pass
             label = customtkinter.CTkLabel(frame, text=f'{self.outputtext[i]}: {self.outputs[i]}')
             label.pack(anchor="w", pady=5)
 
@@ -753,7 +767,17 @@ class resultsscreen():
         close_button = customtkinter.CTkButton(results_window, text="Close", command=results_window.destroy)
         close_button.pack(pady=10)
 
+        
+        # Add a restart animation button
+        restart_button = customtkinter.CTkButton(results_window, text="Restart Animation", command=self.restartanimationthread)
+        restart_button.pack(pady=10)
+
         results_window.mainloop()
+
+    def restartanimationthread(self):
+        animationthread = threading.Thread(target=self.animation)
+        animationthread.start()
+
 
     def save_to_csv(self):
         file_path = tkinter.filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
@@ -763,7 +787,6 @@ class resultsscreen():
                 writer.writerow(["Parameter", "Value"])
                 for i in range(len(self.outputs)):
                     writer.writerow([self.outputtext[i], self.outputs[i]])
-
 def main():
     dataentryscreen = inputscreen()
     dataentryscreen.display()
