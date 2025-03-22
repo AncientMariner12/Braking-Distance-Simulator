@@ -560,8 +560,8 @@ class resultsscreen():
             tempchangeperframe = ((self.maxtemp - self.ambianttemp) / self.brakeingtime) / 60 # type: ignore
 
         running = True
-        wheelspeed = None  # Initialize wheelspeed to avoid reference before assignment
-        bufferframe = 0  # Initialize bufferframe to avoid reference before assignment
+        wheelspeed = None  # Initialize wheelspeed
+        bufferframe = 0  # Initialize bufferframe
 
         #Car constants
         car_x = 500
@@ -766,11 +766,6 @@ class resultsscreen():
         # Add a close button
         close_button = customtkinter.CTkButton(results_window, text="Close", command=results_window.destroy)
         close_button.pack(pady=10)
-
-        
-        # Add a restart animation button
-        restart_button = customtkinter.CTkButton(results_window, text="Restart Animation", command=self.restartanimationthread)
-        restart_button.pack(pady=10)
 
         results_window.mainloop()
 
