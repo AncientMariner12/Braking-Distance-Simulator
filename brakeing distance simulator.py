@@ -9,6 +9,7 @@ import pygame_widgets
 from pygame_widgets.button import Button  
 import csv
 import tkinter.filedialog
+import random  # Add import for random module
 
 # Initialize the font module
 pygame.font.init()
@@ -26,6 +27,8 @@ class inputscreen:
         height = self.screen.winfo_screenheight()
         geometry = str(width) + "x" + str(height)
         self.screen.geometry(geometry)
+        #initalise varables for reaction time test 
+        self.starttime = 0
 
     def getdisplay(self):
         return self.screen
@@ -224,9 +227,44 @@ class inputscreen:
     def info(self):
         pass
     def reacttest(self):
-        print("testing ur reactions :)")
-        pass
+        def startreactiontest():
+            # Wait for a random time between 2 and 5 seconds
+            delay = random.uniform(2, 5)
+            self.reactiontestwindow.after(int(delay * 1000), showclickmessage)
 
+        def showclickmessage():
+            self.starttime = time.time()
+            self.reactionlabel.configure(text="Click now!", fg_color="green")
+            self.reactionbutton.configure(state="normal")
+
+        def calculatereactiontime():
+            endtime = time.time()
+            reactiontime = round(endtime - self.starttime, 3)
+            self.Reacttimewidgets.variable.set(str(reactiontime))  # Set the reaction time in the reaction time widget
+            reactiontime = float(reactiontime)
+            self.reactiontestwindow.destroy()
+
+        # Create a new window for the reaction time test
+        self.reactiontestwindow = customtkinter.CTk()
+        self.reactiontestwindow.eval('tk::PlaceWindow . center')
+        self.reactiontestwindow.title("Reaction Time Test")
+
+        # Add instructions
+        instructionlabel = customtkinter.CTkLabel(self.reactiontestwindow, text="Wait for the 'Click now!' message, then click the button as fast as you can.")
+        instructionlabel.pack(pady=10)
+
+        # adds a label to the button
+        self.reactionlabel = customtkinter.CTkLabel(self.reactiontestwindow, text="Get ready...", fg_color="red")
+        self.reactionlabel.pack(pady=10)
+
+        # Add a button to click
+        self.reactionbutton = customtkinter.CTkButton(self.reactiontestwindow, text="Click", state="disabled", command=calculatereactiontime)
+        self.reactionbutton.pack(pady=10)
+
+        # Start the reaction test
+        startreactiontest()
+
+        self.reactiontestwindow.mainloop()
 
     def simulate(self): #manages  the simulation by calling each method and class as reqired 
         print("Starting simulation")
