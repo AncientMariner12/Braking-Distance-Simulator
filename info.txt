@@ -1,27 +1,36 @@
-Tempature caculation 
-    This is a toggle to enable the option to calculate tempature. 
-    It is off by defult and if it is off the 4 inputs below are not reqired.
+Temperature calculation
+    This is a toggle to enable the option to calculate temperature.
+    It is off by default, and if it is off, the 4 inputs below are not required.
 Ambient Temp
-    The outside tempature is the shade in degrees centergrade 
+    The outside temperature in the shade, measured in degrees Celsius.
 Brake melting point
-    The Tempature at which the structure of the brake disk fails because of heat. Measured in degrees centergrade
-Brake disk dencity 
-    The densicty of the brake disk measured in g/cm^3
+    The temperature at which the structure of the brake disk fails because of heat. Measured in degrees Celsius.
+Brake disk density
+    The density of the brake disk, measured in g/cm^3.
 Disk Volume
-    The Total volume of all of the brake disks in cm^3
-Reaction Time 
-    The reaction time is the time it takes for a human to react to a Signal, measured in seconds 
-    Includes a button laybeled "reaction time test" which will run a reaction time test.
+    The total volume of all of the brake disks, measured in cm^3.
+Reaction Time
+    The reaction time is the time it takes for a human to react to a signal, measured in seconds.
+    Includes a button labeled "reaction time test," which will run a reaction time test.
 Gravity
-    Accelliration due to graverity in m/s^2 
-    Includes a drop down menu with the Accelliration due to graverity on different planets 
+    Acceleration due to gravity, measured in m/s^2.
+    Includes a dropdown menu with the acceleration due to gravity on different planets.
 Velocity
-    The speed of the car in a single direction. 
-    Velocity is the vector form of speed but because the direction is this case is relative to the car, as long as the car is travelling in a straght line (which the program assumes) both velocity and speed will be indenticle
-Friction Coefficient Brakes 
-Friction Coefficient Regen 
-Friction Coefficient Tyres 
+    The speed of the car in a single direction.
+    Velocity is the vector form of speed, but because the direction in this case is relative to the car, as long as the car is traveling in a straight line (which the program assumes), both velocity and speed will be identical.
+Friction Coefficient Brakes
+    The coefficient of friction between the brake pads and disks, always between 0 and 1.
+Friction Coefficient Regen
+    The equivalent coefficient of friction caused by engine braking or regenerative braking in the case of an electric vehicle.
+    Always between 0 and 1.
+Friction Coefficient Tyres
+    The coefficient of friction between the tyres and the road, always between 0 and 1.
+    Includes a dropdown with the coefficient of friction for different road surfaces.
 Mass
-Grade 
-Clamp force 
-Use multiplyer 
+    The mass of the vehicle, measured in kilograms.
+Grade
+    Used to simulate the car braking on a slope. Grade is a percentage, with negative being downhill and positive being uphill.
+Clamp force
+    Clamp force is the force between the brake pads and the brake disks, measured in newtons. If this is unknown, use a typical value of 5000 N.
+Use multiplier
+    Toggle to turn on or off the use of the multiplier that can be used to correlate the program to real-world tests.
