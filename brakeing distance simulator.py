@@ -807,18 +807,18 @@ class resultsscreen():
 
         results_window.mainloop()
 
-    def restartanimationthread(self):
+    def restartanimationthread(self): # this is an unused method because of the problems with the restart button, i decided not to remove it as it may be useful in the future
         animationthread = threading.Thread(target=self.animation)
         animationthread.start()
 
 
-    def save_to_csv(self):
-        file_path = tkinter.filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+    def save_to_csv(self): # saves the results to a csv file 
+        file_path = tkinter.filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")]) #opens a file dialog to get the file path
         if file_path:
             with open(file_path, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(["Parameter", "Value"])
-                for i in range(len(self.outputs)):
+                for i in range(len(self.outputs)): #iterates through the array and writes the results to the csv file 
                     writer.writerow([self.outputtext[i], self.outputs[i]])
 def main():
     dataentryscreen = inputscreen()

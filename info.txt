@@ -1,0 +1,27 @@
+Tempature caculation 
+    This is a toggle to enable the option to calculate tempature. 
+    It is off by defult and if it is off the 4 inputs below are not reqired.
+Ambient Temp
+    The outside tempature is the shade in degrees centergrade 
+Brake melting point
+    The Tempature at which the structure of the brake disk fails because of heat. Measured in degrees centergrade
+Brake disk dencity 
+    The densicty of the brake disk measured in g/cm^3
+Disk Volume
+    The Total volume of all of the brake disks in cm^3
+Reaction Time 
+    The reaction time is the time it takes for a human to react to a Signal, measured in seconds 
+    Includes a button laybeled "reaction time test" which will run a reaction time test.
+Gravity
+    Accelliration due to graverity in m/s^2 
+    Includes a drop down menu with the Accelliration due to graverity on different planets 
+Velocity
+    The speed of the car in a single direction. 
+    Velocity is the vector form of speed but because the direction is this case is relative to the car, as long as the car is travelling in a straght line (which the program assumes) both velocity and speed will be indenticle
+Friction Coefficient Brakes 
+Friction Coefficient Regen 
+Friction Coefficient Tyres 
+Mass
+Grade 
+Clamp force 
+Use multiplyer 
