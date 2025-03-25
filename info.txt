@@ -26,7 +26,7 @@ Velocity
     The speed of the car in a single direction.
     Velocity is the vector form of speed, but because the direction in this case is relative to the car, as long as the car is traveling in a straight line (which the program assumes), both velocity and speed will be identical.
 
-riction Coefficient Brakes
+friction Coefficient Brakes
     The coefficient of friction between the brake pads and disks, always between 0 and 1.
 
 Friction Coefficient Regen
