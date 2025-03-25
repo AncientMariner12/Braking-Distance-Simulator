@@ -225,7 +225,34 @@ class inputscreen:
 
         self.screen.mainloop()  # Start the event loop
     def info(self):
-        pass
+        try:
+            with open("info.txt", "r") as file:
+                infocontent = file.read()
+        except FileNotFoundError:
+            infocontent = "Error: info.txt not found."
+
+        # Create a new window to display the info
+        infowindow = customtkinter.CTk()
+        infowindow.eval('tk::PlaceWindow . center')
+        infowindow.title("Information")
+
+        # Set the size of the window
+        width = 600
+        height = 400
+        geometry = str(width) + "x" + str(height)
+        infowindow.geometry(geometry)
+
+        # Add a textbox to display the content
+        textbox = customtkinter.CTkTextbox(infowindow, width=580, height=380)
+        textbox.pack(pady=10, padx=10, fill="both", expand=True)
+        textbox.insert("0.0", infocontent)
+        textbox.configure(state="disabled")  # Make the textbox read-only
+
+        # Add a close button
+        close_button = customtkinter.CTkButton(infowindow, text="Close", command=infowindow.destroy)
+        close_button.pack(pady=10)
+
+        infowindow.mainloop()
     def reacttest(self):
         def startreactiontest():
             # Wait for a random time between 2 and 5 seconds
@@ -756,15 +783,15 @@ class resultsscreen():
     def results(self):
         print("results")
         # Create the results window using customtkinter
-        results_window = customtkinter.CTk()
-        results_window.eval('tk::PlaceWindow . center')
-        results_window.title("Simulation Results")
+        resultswindow = customtkinter.CTk()
+        resultswindow.eval('tk::PlaceWindow . center')
+        resultswindow.title("Simulation Results")
 
         # Set the size of the window
         width = 800
         height = 600
         geometry = str(width) + "x" + str(height)
-        results_window.geometry(geometry)
+        resultswindow.geometry(geometry)
 
 
         # Convert the boolean to a string for display (because python automatically displays a boolean as 1 or 0 instead of true and false when outputted to a csv file )
@@ -798,14 +825,14 @@ class resultsscreen():
             label.pack(anchor="w", pady=5)
 
         # Add a save button
-        save_button = customtkinter.CTkButton(results_window, text="Save to CSV", command=self.save_to_csv)
-        save_button.pack(pady=10)
+        savebutton = customtkinter.CTkButton(resultswindow, text="Save to CSV", command=self.save_to_csv)
+        savebutton.pack(pady=10)
 
         # Add a close button
-        close_button = customtkinter.CTkButton(results_window, text="Close", command=results_window.destroy)
-        close_button.pack(pady=10)
+        closebutton = customtkinter.CTkButton(resultswindow, text="Close", command=resultswindow.destroy)
+        closebutton.pack(pady=10)
 
-        results_window.mainloop()
+        resultswindow.mainloop()
 
     def restartanimationthread(self): # this is an unused method because of the problems with the restart button, i decided not to remove it as it may be useful in the future
         animationthread = threading.Thread(target=self.animation)
