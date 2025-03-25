@@ -808,7 +808,7 @@ class resultsscreen():
         self.outputtext = ["Braking Distance (m)", "Stopping Distance (m)", "Braking Time (s)", "Stopping Time (s)", "Wheels Locked",   "Initial Velocity (v)",  "Max Temperature (c)", "Temperature Change (c)", "Heat Generated (c)", "Brake Melting Point (c)", "Ambient Temperature (c)"]
 
         # Create a frame to hold the results
-        frame = customtkinter.CTkFrame(results_window)
+        frame = customtkinter.CTkFrame(resultswindow)
         frame.pack(pady=20, padx=20, fill="both", expand=True)
 
         # Iterate through the array and display the results
