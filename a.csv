@@ -1,7 +1,12 @@
 Parameter,Value
-Braking Distance (m),254.867
-Stopping Distance (m),267.492
-Braking Time (s),10.094
-Stopping Time (s),10.344
+Braking Distance (m),220.309
+Stopping Distance (m),235.762
+Braking Time (s),8.725
+Stopping Time (s),9.031
 Wheels Locked,No
 Initial Velocity (v),50.5
+Max Temperature (c),-16.737
+Temperature Change (c),10.263
+Heat Generated (c),26512.5
+Brake Melting Point (c),1150.0
+Ambient Temperature (c),-27.0

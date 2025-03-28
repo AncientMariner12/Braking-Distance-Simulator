@@ -812,10 +812,7 @@ class resultsscreen():
         frame.pack(pady=20, padx=20, fill="both", expand=True)
 
         # Iterate through the array and display the results
-        if self.runtemp == True:
-            length = len(self.outputs) 
-        else:
-            length = len(self.outputs)
+        length = len(self.outputs) 
         for i in range(length):
             try:
                 self.outputs[i] = round(self.outputs[i], 3) # Round the output to 3 decimal places to remove the affect of floating point errors 
