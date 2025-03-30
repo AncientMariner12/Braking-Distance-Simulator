@@ -312,9 +312,9 @@ class inputscreen:
                 outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], simulatedvalues[5], simulatedvalues[6], simulatedvalues[7], simulatedvalues[8], simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue(), self.Ambienttempwidgets.returnvalue())
             else:
                 outputscreen = resultsscreen(simulatedvalues[0], simulatedvalues[1], simulatedvalues[2], simulatedvalues[3], simulatedvalues[4], None, None, None ,None, simulatedvalues[9], simulatedvalues[10], self.Velocitywidgets.returnvalue(), None)
-            simulation_thread = threading.Thread(target=outputscreen.animation)
-            simulation_thread.start()
-            simulation_thread.join()  # Wait for the animation thread to finish
+            simulationthread = threading.Thread(target=outputscreen.animation)
+            simulationthread.start()
+            simulationthread.join()  # Wait for the animation thread to finish
             outputscreen.results()
             
 
@@ -492,8 +492,9 @@ class simulation:
                     print(f"Entered value: {entered_value}")
                     self.tempchange = self.heatgen / (self.Diskdencity * self.Diskvolume * 4 * float(entered_value)) # calculates the tempature change of the disk
                     self.popup_done.set()  # Signal that the popup is done
-                    popup.destroy()  # Close the popup window
                     popup.quit()  # Quit the popup event loop
+                    popup.destroy()  # Close the popup window
+                    time.sleep(0.1)  # Small delay to ensure the popup is closed before continuing
 
                 except Exception as e:
                     print(f"Error: {e}")
